@@ -14,7 +14,7 @@ export default async function (request: ServerRequest) {
   const params = new URLSearchParams(request.url.split("?")[1] ?? "")
   const script = new TextDecoder().decode(await readAll(request.body))
   //Spawn process
-  const process = Deno.run({cmd:["deno", "eval", "--ext", params.get("ext") ?? "ts", "--seed", "0", "--unstable", script], stdout: "piped", stderr: "piped"})
+  const process = Deno.run({cmd:["deno", "eval", "--ext", params.get("ext") ?? "ts", "--seed", "0", "--unstable", "--no-check", script], stdout: "piped", stderr: "piped"})
   try {
     //Wait for process (kill if needed)
     const timeout = setTimeout(() => process.kill(Deno.Signal.SIGKILL), TIMEOUT)

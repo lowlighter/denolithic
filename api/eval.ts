@@ -10,14 +10,16 @@ export default async function (request: ServerRequest) {
   //Only post requests are allowed
   if (request.method !== "POST")
     return request.respond({status:405})
-  //Parse body
+  //Parse requests
+  const params = new URLSearchParams(request.url.split("?")[1] ?? "")
   const script = new TextDecoder().decode(await readAll(request.body))
   //Spawn process
-  const process = Deno.run({cmd:["deno", "eval", "--ext", "<ext>", "--seed", "0", "--unstable", script], stdout: "piped", stderr: "piped"})
+  const process = Deno.run({cmd:["deno", "eval", "--ext", params.get("ext") ?? "ts", "--seed", "0", "--unstable", script], stdout: "piped", stderr: "piped"})
   try {
     //Wait for process (kill if needed)
-    setTimeout(() => process.kill(Deno.Signal.SIGKILL), TIMEOUT)
+    const timeout = setTimeout(() => process.kill(Deno.Signal.SIGKILL), TIMEOUT)
     const [{success, code}, stdout, stderr] = await Promise.all([process.status(), process.output(), process.stderrOutput()])
+    clearTimeout(timeout)
     //Send back status and output
     const headers = new Headers()
     headers.set("x-success", `${Number(success)}`)

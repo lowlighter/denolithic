@@ -83,7 +83,7 @@
           const body = document.querySelector(`[data-executor-uuid="${uuid}"] code`).innerText
           try {
             //Run script
-            const {headers, result} = await fetch("/", {method:"POST", body}).then(async response => ({headers:response.headers, result:await response.text()}))
+            const {headers, result} = await fetch("/api/eval.ts", {method:"POST", body}).then(async response => ({headers:response.headers, result:await response.text()}))
             const success = Number(headers.get("x-success"))
             const code = Number(headers.get("x-code"))
             const duration = Number(headers.get("x-duration"))
@@ -198,9 +198,9 @@ This is a prototype of a powered markdown presentation tool
 
 **Testable execution snippet:**
 ${"```"}js
-function () {
+(function () {
   console.log('hello')
-}
+})()
 ${"```"}
 
 Scripts are evalued through vercel-deno and are subject to code execution limit

@@ -13,7 +13,7 @@ export default async function (request: ServerRequest) {
   //Parse body
   const script = new TextDecoder().decode(await readAll(request.body))
   //Spawn process
-  const process = await Deno.run({cmd:["deno", "eval", "--ext", "<ext>", "--seed", "0", "--unstable", script], stdout: "piped", stderr: "piped"})
+  const process = Deno.run({cmd:["deno", "eval", "--ext", "<ext>", "--seed", "0", "--unstable", script], stdout: "piped", stderr: "piped"})
   try {
     //Wait for process (kill if needed)
     setTimeout(() => process.kill(Deno.Signal.SIGKILL), TIMEOUT)

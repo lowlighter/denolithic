@@ -4,6 +4,6 @@ import { readAll } from "https://deno.land/std@0.97.0/io/util.ts";
 export default async (req: ServerRequest) =>
   req.method === "POST"
     ? req.respond({
-      body: eval(new TextDecoder().decode(await readAll(req.body))),
+      body: new TextEncoder().encode(eval(new TextDecoder().decode(await readAll(req.body)))),
     })
     : req.respond({ status: 405 });

@@ -1,0 +1,246 @@
+<html>
+  <head>
+    <title>Denolithic</title>
+    <meta charset="utf-8">
+    <link href="https://unpkg.com/@primer/css@^16.0.0/dist/primer.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/styles/github.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/12.0.6/markdown-it.min.js"></script>
+  </head>
+  <body>
+
+    <main>
+      <header class="Header">
+        <div class="Header-item">
+          <a href="#" class="Header-link f4 d-flex flex-items-center">
+            <span>Denolithic</span>
+          </a>
+        </div>
+      </header>
+
+      <span class="Progress Progress--small slides-progress">
+        <span class="Progress-item color-bg-info-inverse"></span>
+      </span>
+
+      <aside class="slides"></aside>
+
+      <nav class="paginate-container">
+        <div class="pagination">
+          <a class="previous_page" href="#" onclick="page(-1)">Previous</a>
+          <em aria-current="page">1</em>
+          <a class="next_page" href="#" onclick="page(+1)">Next</a>
+        </div>
+      </nav>
+    </main>
+
+    <style>
+      body { margin: 0; padding: 0; height: 100vh; width: 100vw; }
+      main { display: flex; flex-direction: column; height: 100%; width: 100%; }
+      .slides-progress { border-radius: 0; }
+      .slides { flex-grow: 1; display: flex; overflow-x: auto; }
+      .slides .slide { flex-shrink: 0; width: 100vw; }
+      .slides .slide pre { position: relative; min-height: 44px; }
+      .slides .slide pre code { display: inline-block; }
+      .slides .slide pre code.editor { position: absolute; color: transparent; caret-color: var(--color-text-primary); width: calc(100% - 32px); }
+      .slides .slide pre code:focus { outline: none; }
+      .slides::-webkit-scrollbar { display: none; }
+      .slides { -ms-overflow-style: none; scrollbar-width: none; }
+      .executor-result:empty{ display: none; }
+      .executor-button { position: absolute; right: 0; top: 0; }
+    </style>
+
+    <script>
+
+      /** Page selector */
+      function page(direction) {
+        const slides = document.querySelector(".slides")
+        if (slides) {
+          const pages = document.querySelectorAll(".slides article")?.length ?? 0
+          const width = (document.querySelector(".slides article")?.getBoundingClientRect().width ?? 0)
+          const current = Math.floor(slides.scrollLeft/width)
+          if (direction)
+            slides.scroll({left:(current+direction)*width, behavior:"smooth"})
+          document.querySelector(".previous_page").setAttribute("aria-disabled", current === 0)
+          document.querySelector(".next_page").setAttribute("aria-disabled", current === pages-1)
+          document.querySelector(".slides-progress > *").style.width = `${(100*slides.scrollLeft/((pages-1)*width)).toFixed(1)}%`
+          document.querySelector("[aria-current='page']").innerText = current+1
+        }
+      }
+      document.querySelector(".slides").addEventListener("scroll", () => page())
+      document.addEventListener("keydown", event => {
+        switch (event.key) {
+          case "ArrowLeft": return page(-1)
+          case "ArrowRight": return page(+1)
+        }
+      })
+
+      /** Remote script executor */
+      async function execute(uuid) {
+        //Check
+        const executor = document.querySelector(`.executor-result[data-executor-uuid="${uuid}"]`)
+        if (executor) {
+          //Load script
+          const body = document.querySelector(`[data-executor-uuid="${uuid}"] code`).innerText
+          try {
+            //Run script
+            const {headers, result} = await fetch("/", {method:"POST", body}).then(async response => ({headers:response.headers, result:await response.text()}))
+            const success = Number(headers.get("x-success"))
+            const code = Number(headers.get("x-code"))
+            const duration = Number(headers.get("x-duration"))
+            //Display result
+            executor.innerText = result
+            executor.innerHTML += `<span class="color-text-secondary">${success < 0 ? "Killed (time limit reached)" : `Exited with code ${code}`} (${duration.toFixed(3)} ms)</span>`
+            executor.classList[success === -1 ? "add" : "remove"]?.("flash-error")
+            executor.classList[success === 0 ? "add" : "remove"]?.("flash-warn")
+          }
+          //Handle errors
+          catch {
+            executor.innerText = `<span class="color-text-danger">Server was not able to execute this script</span>`
+            executor.classList.add("flash-error")
+          }
+        }
+      }
+
+      /** Slides setup */
+      async function setup(text) {
+        const markdown = markdownit({html:true})
+
+        /** Slide creator */
+        function Slide() {
+          //Slide wrapper
+          const slide = document.createElement("article")
+          slide.classList.add("p-6", "slide")
+          document.querySelector(".slides").appendChild(slide)
+          //Slide content
+          const body = document.createElement("div")
+          body.classList.add("markdown-body")
+          slide.appendChild(body)
+          return body
+        }
+
+        /** Code editor */
+        function vim({target, key, ctrlKey}) {
+          //Hightlight code
+          try {
+            const language = [...target.classList].filter(key => /^language-/.test(key)).shift()?.replace(/^language-/, "")
+            if (hljs.getLanguage(language)) {
+              target.parentNode.querySelector("code:not(.editor)").innerHTML = hljs.highlight(target.innerText, {language, ignoreIllegals:true}).value
+            }
+          } catch {}
+          //Handle code execution shortcut
+          if ((key === "Enter")&&(ctrlKey))
+            execute(target.parentNode.getAttribute("data-executor-uuid"))
+        }
+
+        //Compute render
+        const menu = []
+        const render = document.createElement("div")
+        render.innerHTML = markdown.render(text)
+        const nodes = Array.from(render.childNodes)
+        while (nodes.length) {
+          const node = nodes.shift()
+          const {nodeName:tag} = node
+
+          //Handle headers and separators
+          if (/^h[1-6r]$/i.test(tag)) {
+            slide = new Slide()
+            if (/^h[1-6]$/i.test(tag))
+              menu.push(node)
+            slide.appendChild(menu.slice(-1).shift().cloneNode(true))
+            continue
+          }
+
+          //Handle other nodes
+          slide.appendChild(node)
+
+          //Handle code blocks
+          if (/^pre$/i.test(tag)) {
+            //Create executor result
+            const uuid = `${Math.random()}`
+            const flash = document.createElement("div")
+            flash.classList.add("flash", "executor-result")
+            flash.setAttribute("data-executor-uuid", uuid)
+            slide.appendChild(flash)
+            //Create executor button
+            const button = document.createElement("button")
+            button.classList.add("btn", "btn-sm", "primary", "executor-button", "m-2")
+            button.setAttribute("type", "button")
+            button.setAttribute("onclick", `execute('${uuid}')`)
+            button.innerText = "Execute snippet"
+            //Create code editor
+            const code = node.querySelector("code")
+            const editor = document.createElement("code")
+            editor.classList.add("editor", ...code.classList)
+            editor.setAttribute("contenteditable", true)
+            editor.setAttribute("spellcheck", false)
+            editor.innerHTML = code.innerHTML ?? ""
+            editor.addEventListener("keyup", vim)
+            editor.addEventListener("keydown", event => event.stopPropagation())
+            //Link code block to executor
+            node.prepend(editor)
+            node.appendChild(button)
+            node.setAttribute("data-executor-uuid", uuid)
+            vim({target:code})
+          }
+        }
+
+        console.log(menu)
+
+      }
+
+
+
+      setup(`
+
+# Hello denolithic!
+
+This is a prototype of a powered markdown presentation tool
+
+**Testable execution snippet:**
+${"```"}js
+function () {
+  console.log('hello')
+}
+${"```"}
+
+Scripts are evalued through vercel-deno and are subject to code execution limit
+
+## Markdown test
+
+**bold text**
+
+*italic text*
+
+${"`"}inline code${"`"}
+
+[link](#)
+
+> quote
+
+<kbd>Ctrl</kbd>
+
+<div class="flash flash-warn">Test raw html</div>
+
+<details>
+  <summary>Summary</summary>
+  Details
+</details>
+
+<!-- Comment -->
+
+___
+
+Using an hr will create a new slide within the same section (defined by header)
+
+![image](https://user-images.githubusercontent.com/22963968/114021347-e3c48b80-9870-11eb-8bc8-998bf39b4d0d.png)
+
+
+
+
+`)
+
+
+
+    </script>
+  </body>
+</html>

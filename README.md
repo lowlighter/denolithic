@@ -9,6 +9,8 @@ Denolithic is a powerful markdown powered presentation tool which can transform 
 
 ![](https://user-images.githubusercontent.com/22963968/119055511-75bfc800-b9c9-11eb-8adf-5ee3a774b2cb.gif)
 
+[Checkout this `README.md` as denolithic presentation slides for a full experience!](https://denolithic.vercel.app/).
+
 ## ✨ Features
 - Markdown powered slides, including extended markup features and raw html support
 - Interactive, editable and syntax-colored code blocks
@@ -18,10 +20,6 @@ Denolithic is a powerful markdown powered presentation tool which can transform 
 - Metadata support
 
 ## 👨‍🔬 Using denolithic
-
-This `README.md` is intended to be viewed as [denolithic presentation slides](https://denolithic.vercel.app/).
-
-Check it out there for a full experience!
 
 **🌧️ Deploy your own instance with Vercel**
 

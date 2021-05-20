@@ -6,6 +6,12 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/styles/github.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/12.0.6/markdown-it.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it-footnote@3.0.2/dist/markdown-it-footnote.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it-mark@3.0.1/dist/markdown-it-mark.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it-abbr@1.0.4/dist/markdown-it-abbr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it-deflist@2.1.0/dist/markdown-it-deflist.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it-container@3.0.0/dist/markdown-it-container.min.js"></script>
   </head>
   <body>
 
@@ -46,7 +52,9 @@
       .slides::-webkit-scrollbar { display: none; }
       .slides { -ms-overflow-style: none; scrollbar-width: none; }
       .executor-result:empty{ display: none; }
-      .executor-button { position: absolute; right: 0; top: 0; }
+      .code-actions { position: absolute; right: 0; top: 0; }
+      .code-actions button:not(:last-child) { margin-right: 0 !important; }
+      .code-actions button svg { fill: currentColor; }
     </style>
 
     <script>
@@ -103,7 +111,14 @@
 
       /** Slides setup */
       async function setup(text) {
-        const markdown = markdownit({html:true})
+        const markdown = markdownit({langPrefix:"language-", html:true, linkify:true, typographer:true})
+          .use(markdownitFootnote)
+          .use(markdownitMark)
+          .use(markdownitAbbr)
+          .use(markdownitDeflist)
+          .use(markdownitContainer)
+        markdown.renderer.rules.footnote_block_open = () => `<footer class="footnotes pl-3"><ol>`
+        markdown.renderer.rules.footnote_block_close = () => `</footer></ol>`
 
         /** Slide creator */
         function Slide() {
@@ -112,9 +127,12 @@
           slide.classList.add("p-6", "slide")
           document.querySelector(".slides").appendChild(slide)
           //Slide content
+          const container = document.createElement("div")
+          container.classList.add("container-md")
+          slide.appendChild(container)
           const body = document.createElement("div")
-          body.classList.add("markdown-body")
-          slide.appendChild(body)
+          body.classList.add("markdown-body", "col-12")
+          container.appendChild(body)
           return body
         }
 
@@ -137,107 +155,117 @@
         const render = document.createElement("div")
         render.innerHTML = markdown.render(text)
         const nodes = Array.from(render.childNodes)
+        let slide = null, empty = true, footnotes = null
         while (nodes.length) {
           const node = nodes.shift()
           const {nodeName:tag} = node
 
+          //Comments
+          if (/^#comment$/i.test(tag)) {
+            console.log(node.textContent)
+            continue
+          }
+
           //Handle headers and separators
           if (/^h[1-6r]$/i.test(tag)) {
             slide = new Slide()
+            empty = true
             if (/^h[1-6]$/i.test(tag))
               menu.push(node)
             slide.appendChild(menu.slice(-1).shift().cloneNode(true))
             continue
           }
 
+          //Handle footnotes
+          if ((/^footer$/i.test(tag))&&([...node.classList].includes("footnotes"))) {
+            footnotes = node
+            continue
+          }
+
           //Handle other nodes
-          slide.appendChild(node)
+          empty = false
+          slide?.appendChild(node)
 
           //Handle code blocks
           if (/^pre$/i.test(tag)) {
-            //Create executor result
-            const uuid = `${Math.random()}`
-            const flash = document.createElement("div")
-            flash.classList.add("flash", "executor-result")
-            flash.setAttribute("data-executor-uuid", uuid)
-            slide.appendChild(flash)
-            //Create executor button
-            const button = document.createElement("button")
-            button.classList.add("btn", "btn-sm", "primary", "executor-button", "m-2")
-            button.setAttribute("type", "button")
-            button.setAttribute("onclick", `execute('${uuid}')`)
-            button.innerText = "Execute snippet"
             //Create code editor
             const code = node.querySelector("code")
             const editor = document.createElement("code")
+            const initalContent = code.innerText
             editor.classList.add("editor", ...code.classList)
             editor.setAttribute("contenteditable", true)
             editor.setAttribute("spellcheck", false)
             editor.innerHTML = code.innerHTML ?? ""
             editor.addEventListener("keyup", vim)
             editor.addEventListener("keydown", event => event.stopPropagation())
+            //Create executor result
+            const uuid = `${Math.random()}`.substring(2)
+            const flash = document.createElement("div")
+            flash.classList.add("flash", "executor-result")
+            flash.setAttribute("data-executor-uuid", uuid)
+            slide?.appendChild(flash)
+            //Actions
+            const actions = document.createElement("div")
+            actions.classList.add("code-actions")
+            //Create reset button
+            const reset = document.createElement("button")
+            reset.classList.add("btn", "btn-sm", "primary", "copy-button", "m-2")
+            reset.setAttribute("type", "button")
+            reset.addEventListener("click", () => {
+              editor.innerHTML = initalContent
+              code.innerHTML = initalContent
+              vim({target:code})
+            })
+            reset.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path fill-rule="evenodd" d="M8 2.5a5.487 5.487 0 00-4.131 1.869l1.204 1.204A.25.25 0 014.896 6H1.25A.25.25 0 011 5.75V2.104a.25.25 0 01.427-.177l1.38 1.38A7.001 7.001 0 0114.95 7.16a.75.75 0 11-1.49.178A5.501 5.501 0 008 2.5zM1.705 8.005a.75.75 0 01.834.656 5.501 5.501 0 009.592 2.97l-1.204-1.204a.25.25 0 01.177-.427h3.646a.25.25 0 01.25.25v3.646a.25.25 0 01-.427.177l-1.38-1.38A7.001 7.001 0 011.05 8.84a.75.75 0 01.656-.834z"></path></svg>`
+            actions.appendChild(reset)
+            //Create copy button
+            const copy = document.createElement("button")
+            copy.classList.add("btn", "btn-sm", "primary", "copy-button", "m-2")
+            copy.setAttribute("type", "button")
+            copy.setAttribute("data-clipboard-target", `[data-executor-uuid="${uuid}"] .editor`)
+            copy.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path fill-rule="evenodd" d="M5.75 1a.75.75 0 00-.75.75v3c0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75v-3a.75.75 0 00-.75-.75h-4.5zm.75 3V2.5h3V4h-3zm-2.874-.467a.75.75 0 00-.752-1.298A1.75 1.75 0 002 3.75v9.5c0 .966.784 1.75 1.75 1.75h8.5A1.75 1.75 0 0014 13.25v-9.5a1.75 1.75 0 00-.874-1.515.75.75 0 10-.752 1.298.25.25 0 01.126.217v9.5a.25.25 0 01-.25.25h-8.5a.25.25 0 01-.25-.25v-9.5a.25.25 0 01.126-.217z"></path></svg>`
+            actions.appendChild(copy)
+            //Create executor button
+            const executor = document.createElement("button")
+            executor.classList.add("btn", "btn-sm", "primary", "executor-button", "m-2")
+            executor.setAttribute("type", "button")
+            executor.addEventListener("click", () => execute(uuid))
+            executor.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path fill-rule="evenodd" d="M1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0zM8 0a8 8 0 100 16A8 8 0 008 0zM6.379 5.227A.25.25 0 006 5.442v5.117a.25.25 0 00.379.214l4.264-2.559a.25.25 0 000-.428L6.379 5.227z"></path></svg>`
+            actions.appendChild(executor)
             //Link code block to executor
             node.prepend(editor)
-            node.appendChild(button)
+            node.appendChild(actions)
             node.setAttribute("data-executor-uuid", uuid)
             vim({target:code})
           }
         }
 
-        console.log(menu)
+        //Copy paste initializer
+        new ClipboardJS(".copy-button")
 
+        /** Checkbox formatter */
+        function checkbox(element) {
+          if (/^\s*\[[x ]\]\s+/.test(element.innerText)) {
+            element.innerHTML = element.innerHTML.replace(/^\s*\[(?<checked>[x ])\]/, (m, checked) => `<input type="checkbox" ${checked === "x" ? "checked" : ""}>`)
+            element.querySelectorAll("li").forEach(checkbox)
+          }
+        }
+        document.querySelectorAll("li").forEach(checkbox)
+
+        //Append footnotes
+        if (footnotes) {
+          new Set([...document.querySelectorAll("article .footnote-ref")].map(element => element.closest("article .container-md"))).forEach(element => {
+            const hr = document.createElement("hr")
+            element.appendChild(hr)
+            const localFootnotes = footnotes.cloneNode(true)
+            element.appendChild(localFootnotes)
+          })
+        }
       }
 
+      (async () => setup(await fetch("/README.md").then(response => response.text())))()
 
 
-      setup(`
-
-# Hello denolithic!
-
-This is a prototype of a powered markdown presentation tool
-
-**Testable execution snippet:**
-${"```"}js
-(function () {
-  console.log('hello')
-})()
-${"```"}
-
-Scripts are evalued through vercel-deno and are subject to code execution limit
-
-## Markdown test
-
-**bold text**
-
-*italic text*
-
-${"`"}inline code${"`"}
-
-[link](#)
-
-> quote
-
-<kbd>Ctrl</kbd>
-
-<div class="flash flash-warn">Test raw html</div>
-
-<details>
-  <summary>Summary</summary>
-  Details
-</details>
-
-<!-- Comment -->
-
-___
-
-Using an hr will create a new slide within the same section (defined by header)
-
-![image](https://user-images.githubusercontent.com/22963968/114021347-e3c48b80-9870-11eb-8bc8-998bf39b4d0d.png)
-
-
-
-
-`)
 
 
 

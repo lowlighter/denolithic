@@ -7,6 +7,8 @@ author: lowlighter
 
 Denolithic is a powerful markdown powered presentation tool which can transform any markdown file into slides.
 
+![](https://user-images.githubusercontent.com/22963968/119055511-75bfc800-b9c9-11eb-8adf-5ee3a774b2cb.gif)
+
 ## ✨ Features
 - Markdown powered slides, including extended markup features and raw html support
 - Interactive, editable and syntax-colored code blocks

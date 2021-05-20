@@ -59,6 +59,11 @@
     </style>
 
     <script>
+      /** Transform into slug */
+      function slug(text) {
+        return text.replace(/[^\w]/g, "-").replace(/-+/g, "-").replace(/(^-)|(-$)/, "").toLocaleLowerCase()
+      }
+
       /** Page selector */
       function page(direction) {
         const slides = document.querySelector(".slides")
@@ -72,6 +77,10 @@
           document.querySelector(".next_page").setAttribute("aria-disabled", current === pages-1)
           document.querySelector(".slides-progress > *").style.width = `${(100*slides.scrollLeft/((pages-1)*width)).toFixed(1)}%`
           document.querySelector("[aria-current='page']").innerText = current+1
+
+          const slide = document.querySelector(`.slides article:nth-child(${current+1})`)
+          if ((slide)&&(location.hash !== `#${slide.id}`))
+            history.replaceState(null, slide.querySelector("h1, h2, h3, h4, h5, h6").innerText, `#${slide.id}`);
         }
       }
       document.querySelector(".slides").addEventListener("scroll", () => page())
@@ -139,6 +148,22 @@
           return body
         }
 
+        /** Nav builder */
+        function Nav(elements) {
+          const nav = document.createElement("nav")
+          nav.setAttribute("aria-label", "Breadcrumb")
+          const ol = document.createElement("ol")
+          ol.classList.add("p-0")
+          nav.appendChild(ol)
+          for (const element of elements) {
+            const li = document.createElement("li")
+            li.classList.add("breadcrumb-item")
+            li.innerHTML = `<a href="#${slug(element.innerText)}">${element.innerText}</a>`
+            ol.appendChild(li)
+          }
+          return nav
+        }
+
         /** Code editor */
         function vim({target, key, ctrlKey}) {
           //Hightlight code
@@ -154,7 +179,7 @@
         }
 
         //Compute render
-        const menu = []
+        const nav = []
         const render = document.createElement("div")
         render.innerHTML = markdown.render(text)
         const nodes = Array.from(render.childNodes)
@@ -173,9 +198,19 @@
           if (/^h[1-6r]$/i.test(tag)) {
             slide = new Slide()
             empty = true
-            if (/^h[1-6]$/i.test(tag))
-              menu.push(node)
-            slide.appendChild(menu.slice(-1).shift().cloneNode(true))
+            if (/^h[1-6]$/i.test(tag)) {
+              const previous = Number(nav.slice(-1).shift()?.nodeName.substring(1) ?? 0)
+              const current = Number(tag.substring(1))
+              console.log(previous, current, node.innerText)
+              if (previous === current)
+                nav[nav.length-1] = node
+              else if (previous < current)
+                nav.push(node)
+              else if (previous > current)
+                nav.pop()
+            }
+            slide.appendChild(Nav(nav.slice(0, nav.length-1)))
+            slide.appendChild(nav.slice(-1).shift().cloneNode(true))
             continue
           }
 
@@ -266,6 +301,9 @@
             element.appendChild(localFootnotes)
           })
         }
+
+        //Create links
+        document.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach(element => element.closest("article").id = slug(element.innerText))
       }
 
       (async () => setup(await fetch("/README.md").then(response => response.text())))()

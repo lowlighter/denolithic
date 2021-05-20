@@ -5,10 +5,9 @@
 
   todo:
     menu
-    footnote filter
-    container
-    deno.eval
     clean index.html
+    bulletproof arrow
+    accept query param to url target
 -->
 
 # 🦕 Denolithic

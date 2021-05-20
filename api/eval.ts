@@ -14,7 +14,7 @@ export default async function (request: ServerRequest) {
   const script = new TextDecoder().decode(await readAll(request.body))
   //Spawn process
   let killed = false
-  const process = Deno.run({cmd:["deno", "run", "--allow-all", "--seed", "0", "--unstable", "--no-check", "-"], stdin: "piped", stdout: "piped", stderr: "piped"})
+  const process = Deno.run({cmd:["deno", "run", "--allow-all", "--seed", "0", "--unstable", "--no-check", "-"], stdin: "piped", stdout: "piped", stderr: "piped", env: {DENO_DIR: "/tmp/.deno"}})
   try {
     //Wait for process (kill if needed)
     await writeAll(process.stdin, new TextEncoder().encode(script))

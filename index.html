@@ -2,6 +2,10 @@
   <head>
     <title>Denolithic</title>
     <meta charset="utf-8">
+    <meta property="og:title" content="Denolithic">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="/static/opengraph.png">
+    <meta property="og:description" content="Create presentation slides from markdown">
     <link href="https://unpkg.com/@primer/css@^16.0.0/dist/primer.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/styles/github.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/highlight.min.js"></script>
@@ -16,11 +20,20 @@
   <body>
 
     <main>
-      <header class="Header">
+      <header class="Header header">
         <div class="Header-item">
           <a href="#" class="Header-link f4 d-flex flex-items-center">
-            <span>Denolithic</span>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path fill-rule="evenodd" d="M6.368 1.01a.75.75 0 01.623.859L6.57 4.5h3.98l.46-2.868a.75.75 0 011.48.237L12.07 4.5h2.18a.75.75 0 010 1.5h-2.42l-.64 4h2.56a.75.75 0 010 1.5h-2.8l-.46 2.869a.75.75 0 01-1.48-.237l.42-2.632H5.45l-.46 2.869a.75.75 0 01-1.48-.237l.42-2.632H1.75a.75.75 0 010-1.5h2.42l.64-4H2.25a.75.75 0 010-1.5h2.8l.46-2.868a.75.75 0 01.858-.622zM9.67 10l.64-4H6.33l-.64 4h3.98z"></path></svg>            <span>Denolithic</span>
           </a>
+        </div>
+        <div class="Header-item Header-item--full"></div>
+        <div class="Header-item">
+          <details class="dropdown details-reset details-overlay d-inline-block">
+            <summary class="text-gray p-2 d-inline" aria-haspopup="true">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill-rule="evenodd" d="M4 7a1 1 0 100-2 1 1 0 000 2zm4.75-1.5a.75.75 0 000 1.5h11.5a.75.75 0 000-1.5H8.75zm0 6a.75.75 0 000 1.5h11.5a.75.75 0 000-1.5H8.75zm0 6a.75.75 0 000 1.5h11.5a.75.75 0 000-1.5H8.75zM5 12a1 1 0 11-2 0 1 1 0 012 0zm-1 7a1 1 0 100-2 1 1 0 000 2z"></path></svg>
+            </summary>
+            <ul class="dropdown-menu dropdown-menu-sw"></ul>
+          </details>
         </div>
       </header>
 
@@ -42,6 +55,7 @@
     <style>
       body { margin: 0; padding: 0; height: 100vh; width: 100vw; }
       main { display: flex; flex-direction: column; height: 100%; width: 100%; }
+      .header svg { fill: currentColor; }
       .slides-progress { border-radius: 0; }
       .slides { flex-grow: 1; display: flex; overflow-x: auto; }
       .slides .slide { flex-shrink: 0; width: 100vw; }
@@ -49,16 +63,20 @@
       .slides .slide pre code { display: inline-block; }
       .slides .slide pre code.editor { position: absolute; color: transparent; caret-color: var(--color-text-primary); width: calc(100% - 32px); }
       .slides .slide pre code:focus { outline: none; }
-      .slides::-webkit-scrollbar { display: none; }
-      .slides { -ms-overflow-style: none; scrollbar-width: none; }
+      .slides .slide { overflow: auto; }
       .executor-result:empty{ display: none; }
       .code-actions { position: absolute; right: 0; top: 0; }
       .code-actions button:not(:last-child) { margin-right: 0 !important; }
       .code-actions button svg { fill: currentColor; }
       footer.footnotes ul { list-style-type: none; }
+      * { -ms-overflow-style: none; scrollbar-width: none; }
+      *::-webkit-scrollbar { display: none; }
+      .btn[disabled] { cursor: not-allowed; }
     </style>
 
     <script>
+      const SUPPORTED_LANGUAGES = /js|ts|javascript|typescript/i
+
       /** Transform into slug */
       function slug(text) {
         return text.replace(/[^\w]/g, "-").replace(/-+/g, "-").replace(/(^-)|(-$)/, "").toLocaleLowerCase()
@@ -68,17 +86,17 @@
       function page(direction) {
         const slides = document.querySelector(".slides")
         if (slides) {
-          const pages = document.querySelectorAll(".slides article")?.length ?? 0
-          const width = (document.querySelector(".slides article")?.getBoundingClientRect().width ?? 0)
-          const current = Math.floor(slides.scrollLeft/width)
+          const pages = document.querySelectorAll(".slides .slide")?.length ?? 0
+          const width = window.innerWidth
+          const current = Math.round(slides.scrollLeft/width)
           if (direction)
             slides.scroll({left:(current+direction)*width, behavior:"smooth"})
           document.querySelector(".previous_page").setAttribute("aria-disabled", current === 0)
           document.querySelector(".next_page").setAttribute("aria-disabled", current === pages-1)
           document.querySelector(".slides-progress > *").style.width = `${(100*slides.scrollLeft/((pages-1)*width)).toFixed(1)}%`
-          document.querySelector("[aria-current='page']").innerText = current+1
+          document.querySelector("[aria-current='page']").innerText = `${current+1} / ${pages}`
 
-          const slide = document.querySelector(`.slides article:nth-child(${current+1})`)
+          const slide = document.querySelector(`.slides .slide:nth-child(${current+1})`)
           if ((slide)&&(location.hash !== `#${slide.id}`))
             history.replaceState(null, slide.querySelector("h1, h2, h3, h4, h5, h6").innerText, `#${slide.id}`);
         }
@@ -180,6 +198,7 @@
 
         //Compute render
         const nav = []
+        const headnav = new Set()
         const render = document.createElement("div")
         render.innerHTML = markdown.render(text)
         const nodes = Array.from(render.childNodes)
@@ -199,15 +218,18 @@
             slide = new Slide()
             empty = true
             if (/^h[1-6]$/i.test(tag)) {
+              headnav.add(node)
               const previous = Number(nav.slice(-1).shift()?.nodeName.substring(1) ?? 0)
               const current = Number(tag.substring(1))
-              console.log(previous, current, node.innerText)
               if (previous === current)
                 nav[nav.length-1] = node
               else if (previous < current)
                 nav.push(node)
-              else if (previous > current)
-                nav.pop()
+              else if (previous > current) {
+                for (let i = previous; i >= current; i--)
+                  nav.pop()
+                nav.push(node)
+              }
             }
             slide.appendChild(Nav(nav.slice(0, nav.length-1)))
             slide.appendChild(nav.slice(-1).shift().cloneNode(true))
@@ -230,6 +252,7 @@
             const code = node.querySelector("code")
             const editor = document.createElement("code")
             const initalContent = code.innerText
+            const language = [...code.classList].filter(key => /^language-/.test(key)).shift()?.replace(/^language-/, "")
             editor.classList.add("editor", ...code.classList)
             editor.setAttribute("contenteditable", true)
             editor.setAttribute("spellcheck", false)
@@ -239,7 +262,7 @@
             //Create executor result
             const uuid = `${Math.random()}`.substring(2)
             const flash = document.createElement("div")
-            flash.classList.add("flash", "executor-result")
+            flash.classList.add("flash", "executor-result", "text-mono", "text-small")
             flash.setAttribute("data-executor-uuid", uuid)
             slide?.appendChild(flash)
             //Actions
@@ -267,7 +290,10 @@
             const executor = document.createElement("button")
             executor.classList.add("btn", "btn-sm", "primary", "executor-button", "m-2")
             executor.setAttribute("type", "button")
-            executor.addEventListener("click", () => execute(uuid))
+            if (SUPPORTED_LANGUAGES.test(language))
+              executor.addEventListener("click", () => execute(uuid))
+            else
+              executor.setAttribute("disabled", true)
             executor.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path fill-rule="evenodd" d="M1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0zM8 0a8 8 0 100 16A8 8 0 008 0zM6.379 5.227A.25.25 0 006 5.442v5.117a.25.25 0 00.379.214l4.264-2.559a.25.25 0 000-.428L6.379 5.227z"></path></svg>`
             actions.appendChild(executor)
             //Link code block to executor
@@ -292,7 +318,7 @@
 
         //Append footnotes
         if (footnotes) {
-          new Set([...document.querySelectorAll("article .footnote-ref")].map(element => element.closest("article .container-md"))).forEach(element => {
+          new Set([...document.querySelectorAll(".slide .footnote-ref")].map(element => element.closest(".slide .container-md"))).forEach(element => {
             const hr = document.createElement("hr")
             element.appendChild(hr)
             const localFootnotes = footnotes.cloneNode(true)
@@ -303,11 +329,35 @@
         }
 
         //Create links
-        document.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach(element => element.closest("article").id = slug(element.innerText))
+        document.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach(element => element.closest(".slide").id = slug(element.innerText))
+
+        //Create header nav
+        headnav.forEach(element => {
+          console.log(element.innerText)
+          const li = document.createElement("li")
+          li.innerHTML = `<a class="dropdown-item" href="#${slug(element.innerText)}">${element.innerText.replace(/(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g, "").trim()}</a>`
+          document.querySelector(".Header .dropdown-menu").appendChild(li)
+        })
+
+        //Smooth scroll anchors
+        document.querySelectorAll(`a[href^="#"]`).forEach(anchor =>
+          anchor.addEventListener("click", function (event) {
+            event.preventDefault()
+            document.querySelector(this.getAttribute("href")).scrollIntoView({behavior:"smooth"})
+          })
+        )
+
+        //Set page
+        page()
       }
 
-      (async () => setup(await fetch("/README.md").then(response => response.text())))()
+      /** Load content */
+      async function load() {
+        const target = new URLSearchParams(window.location.search).get("target")
+        return (target ? fetch("/api/load.ts", {method:"POST", body:target}) : fetch("/README.md")).then(response => response.text())
+      }
 
+      (async () => setup(await load()))()
     </script>
   </body>
 </html>

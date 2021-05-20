@@ -1,31 +1,38 @@
 <!--
-  title: Denolithic
-  author: lowlighter
-
-
-  todo:
-    menu
-    clean index.html
-    bulletproof arrow
-    accept query param to url target
+name: Denolithic
+author: lowlighter
 -->
 
 # 🦕 Denolithic
 
 Denolithic is a powerful markdown powered presentation tool which can transform any markdown file into slides.
 
-**✨ Features**
-- [x] Markdown powered slides, including extended markup features
-  - [x] Raw html is also supported for complex elements
-- [x] Interactive and syntax-colored code blocks
-  - [x] Run code and display output and return
-  - [x] Copy code to clipboard easily
-  - [x] Edit code content to experiment around and reset to original value
-- [x] Smooth design powered by GitHub's primer style
-- [ ] Intuitive controls and navigation elements
-- [ ] Linkable slides
+## ✨ Features
+- Markdown powered slides, including extended markup features and raw html support
+- Interactive, editable and syntax-colored code blocks
+  - JS and TS code snippetes can even be ran live!
+- Smooth design powered by GitHub's primer style
+- Intuitive controls and navigation elements, including linkable slides
+- Metadata support
 
-## 👨‍🏫 Presenting slides
+## 👨‍🔬 Using denolithic
+
+This `README.md` is intended to be viewed as [denolithic presentation slides](https://denolithic.vercel.app/).
+
+Check it out there for a full experience!
+
+**🌧️ Deploy your own instance with Vercel**
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Flowlighter%2Fdenolithic&env=DENO_UNSTABLE&envDescription=Set%20to%20true%20to%20enable%20unstable%20features%20of%20deno%20runtime%20(required%20for%20code%20execution)&project-name=denolithic&repository-name=denolithic&demo-title=Denolithic&demo-description=Create%20presentation%20slides%20from%20markdown&demo-url=https%3A%2F%2Fdenolithic.vercel.app&demo-image=https%3A%2F%2Fdenolithic.vercel.app%2Fstatic%2Fopengraph.png)
+
+**🧪 Test it on your own markdown file!**
+
+<form class="d-flex">
+  <input id="denolithic-it" class="form-control flex-1 mr-2" type="url" placeholder="Link to a markdown file">
+  <button type="button" class="btn btn-primary" onclick="window.location.replace(`${location.pathname}?target=${encodeURIComponent(document.querySelector('#denolithic-it').value)}`)">Denolithic it!</button>
+</form>
+
+### 👨‍🏫 Presenting slides
 
 Each markdown header (`#` to `######`) will create a new slide, with its content as title.
 A slug will also be associated with it so you can share a specific slide link.
@@ -40,7 +47,7 @@ Navigate through slides using:
 - Arrow keys <kbd>←</kbd> and <kbd>→</kbd>
 - `Previous` and `Next` buttons *(located at the bottom of page)*
 
-## 💻 Embedding code blocks
+### 💻 Embedding code blocks
 
 Code blocks are syntax-colored, content editable, copy-pastable and runnable
 
@@ -55,7 +62,7 @@ console.log(`Hello, ${cyan("世界")}`)
 
 <span class="color-text-secondary">*Process will be killed if it exceeds allowed time execution limit*</span>
 
-## ✍️ Writing content using markdown
+### ✍️ Writing content using markdown
 
 *[ABBREVIATION]: This details abbreviation
 [^1]: This is Jojo reference
@@ -95,13 +102,9 @@ Important concept
 Display `info`, `warn`, `error` and `success` messages using triple colons `:::`
 :::
 
-## ✍️ Writing content using raw HTML
+### ✍️ Writing content using raw HTML
 
 It is also possible to use html tags for complex content like <kbd>keyboard keys</kbd>, <sup>superscript</sup> or <sub>subscript</sub> texts, etc.
-
-[^longnote]: Ok again
-
-Ceci est une references[^longnote]
 
 <details>
   <summary>Like creating expandable sections</summary>
@@ -134,7 +137,7 @@ Or use [primer css style](https://primer.style/css/) predefined classes like bel
 > MIT License<br>
 > Copyright (c) 2021-present [@lowlighter](https://github.com/lowlighter)
 
-**Credits**
+**🥇 Credits**
 
 [lowlighter/denolithic](https://github.com/lowlighter/denolithic) is powered by:
 * [vercel](https://vercel.com)

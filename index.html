@@ -55,10 +55,10 @@
       .code-actions { position: absolute; right: 0; top: 0; }
       .code-actions button:not(:last-child) { margin-right: 0 !important; }
       .code-actions button svg { fill: currentColor; }
+      footer.footnotes ul { list-style-type: none; }
     </style>
 
     <script>
-
       /** Page selector */
       function page(direction) {
         const slides = document.querySelector(".slides")
@@ -116,9 +116,12 @@
           .use(markdownitMark)
           .use(markdownitAbbr)
           .use(markdownitDeflist)
-          .use(markdownitContainer)
-        markdown.renderer.rules.footnote_block_open = () => `<footer class="footnotes pl-3"><ol>`
-        markdown.renderer.rules.footnote_block_close = () => `</footer></ol>`
+          .use(markdownitContainer, "info", {render:(tokens, index) => tokens[index].nesting === 1 ? `<div class="flash">` : `</div>`})
+          .use(markdownitContainer, "warn", {render:(tokens, index) => tokens[index].nesting === 1 ? `<div class="flash flash-warn">` : `</div>`})
+          .use(markdownitContainer, "error", {render:(tokens, index) => tokens[index].nesting === 1 ? `<div class="flash flash-error">` : `</div>`})
+          .use(markdownitContainer, "success", {render:(tokens, index) => tokens[index].nesting === 1 ? `<div class="flash flash-success">` : `</div>`})
+        markdown.renderer.rules.footnote_block_open = () => `<footer class="footnotes pl-3"><ul>`
+        markdown.renderer.rules.footnote_block_close = () => `</ul></footer>`
 
         /** Slide creator */
         function Slide() {
@@ -258,16 +261,14 @@
             const hr = document.createElement("hr")
             element.appendChild(hr)
             const localFootnotes = footnotes.cloneNode(true)
+            const references = [...element.querySelectorAll(".footnote-ref a")].map(footnote => footnote.getAttribute("href").substring(1))
+            localFootnotes.querySelectorAll("li").forEach(element => references.includes(element.id) ? element.querySelector("p").prepend(`${element.id.replace(/^fn/, "")}. `) : element.remove())
             element.appendChild(localFootnotes)
           })
         }
       }
 
       (async () => setup(await fetch("/README.md").then(response => response.text())))()
-
-
-
-
 
     </script>
   </body>

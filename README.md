@@ -58,7 +58,7 @@ console.log(`Hello, ${cyan("世界")}`)
 
 ## ✍️ Writing content using markdown
 
-*[ABBREVIATION] This details abbreviation
+*[ABBREVIATION]: This details abbreviation
 [^1]: This is Jojo reference
 
 You can use common markdown to style your content with **bold text**, *italic text*, ~~strikethrough text~~, `inline code`, [links](#), references[^1], ==highlighted text==, ABBREVIATION, etc.
@@ -92,13 +92,17 @@ Important concept
   </div>
 </div>
 
-::: flash
-Here's a container displayed using triple colons `:::`
+::: info
+Display `info`, `warn`, `error` and `success` messages using triple colons `:::`
 :::
 
 ## ✍️ Writing content using raw HTML
 
 It is also possible to use html tags for complex content like <kbd>keyboard keys</kbd>, <sup>superscript</sup> or <sub>subscript</sub> texts, etc.
+
+[^longnote]: Ok again
+
+Ceci est une references[^longnote]
 
 <details>
   <summary>Like creating expandable sections</summary>

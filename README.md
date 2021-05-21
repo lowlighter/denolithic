@@ -1,7 +1,5 @@
-<!--
-name: Denolithic
-author: lowlighter
--->
+<!-- [d-meta] title: Denolithic preview -->
+<!-- [d-meta] author: lowlighter -->
 
 # 🦕 Denolithic
 
@@ -17,13 +15,17 @@ Denolithic is a powerful markdown powered presentation tool which can transform 
 
 ## 👨‍🔬 Using denolithic
 
-This `README.md` is intended to be viewed as [denolithic presentation slides](https://denolithic.vercel.app/).
+<!-- [d-comment -->
+This `README.md` is intended to be viewed as denolithic presentation slides.
 
-Check it out there for a full experience!
+[Check it out here for a full experience!](https://denolithic.vercel.app/).
+<!-- d-comment] -->
 
 **🌧️ Deploy your own instance with Vercel**
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Flowlighter%2Fdenolithic&env=DENO_UNSTABLE&envDescription=Set%20to%20true%20to%20enable%20unstable%20features%20of%20deno%20runtime%20(required%20for%20code%20execution)&project-name=denolithic&repository-name=denolithic&demo-title=Denolithic&demo-description=Create%20presentation%20slides%20from%20markdown&demo-url=https%3A%2F%2Fdenolithic.vercel.app&demo-image=https%3A%2F%2Fdenolithic.vercel.app%2Fstatic%2Fopengraph.png)
+
+<!-- [d-uncomment
 
 **🧪 Test it on your own markdown file!**
 
@@ -76,7 +78,7 @@ Raw links will be transformed into actual links (like https://github.com/lowligh
   <div class="col-3 text-center">
 
 | Table              |     |
-| -------------------| :-: |
+| ------------------ | :-: |
 | Denolithic         | ✔️ |
 
   </div>
@@ -131,6 +133,23 @@ Or use [primer css style](https://primer.style/css/) predefined classes like bel
     This is the beginning of a new adventure!
   </div>
 </div>
+
+### Using meta-tags and meta-data
+
+The following meta-tags are supported:
+
+| Meta-tag                        | Effect                                                  |
+| ------------------------------- | ------------------------------------------------------- |
+| `[d-comment` and `d-comment]`   | Content between these instructions will not be rendered |
+| `[d-uncomment ... d-uncomment]` | Content within this instruction will be rendered        |
+| `[d-meta] key: value`           | Define a meta-data value                                |
+
+These can be used to describe what should be ignored by classic markdown renderers and what should be displayed by denolithic.
+
+Meta-data :
+- `title` sets both html and header title
+
+d-uncomment] -->
 
 ## 📜 License
 

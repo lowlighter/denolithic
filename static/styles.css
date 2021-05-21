@@ -1,0 +1,102 @@
+/* App */
+
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  width: 100vw;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.header svg {
+  fill: currentColor;
+}
+
+.btn[disabled] {
+  cursor: not-allowed;
+}
+
+.d-none-loading {
+  display: none !important;
+}
+
+/* Slides */
+
+.slides {
+  flex-grow: 1;
+  display: flex;
+  overflow-x: auto;
+}
+
+.slide {
+  overflow: auto;
+  flex-shrink: 0;
+  width: 100vw;
+}
+
+.slides-progress {
+  border-radius: 0;
+}
+
+/* Slides code snippets */
+
+.slide pre {
+  position: relative;
+  min-height: 44px;
+}
+
+.slide pre code {
+  display: inline-block;
+}
+
+.slide pre code.editor {
+  position: absolute;
+  color: transparent;
+  width: calc(100% - 32px);
+  caret-color: var(--color-text-primary);
+}
+
+.slide pre code:focus {
+  outline: none;
+}
+
+.slide .executor-result:empty {
+  display: none;
+}
+
+.slide .code-actions {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.slide .code-actions button svg {
+  fill: currentColor;
+}
+
+.slide .code-actions button:not(:last-child) {
+  margin-right: 0 !important;
+}
+
+/* Footnotes */
+
+.slide footer.footnotes ul {
+  list-style-type: none;
+}
+
+/* Scrollbars */
+
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}

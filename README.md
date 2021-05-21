@@ -34,9 +34,9 @@ Use [Vercel](https://vercel.com) to deploy your own instance:
 
 Enter an URL to any markdown file to preview it live with denolithic:
 
-<form class="d-flex">
+<form class="d-flex" onsubmit="window.location.replace(`${location.pathname}?target=${encodeURIComponent(document.querySelector('#denolithic-it').value)}`)">
   <input id="denolithic-it" class="form-control flex-1 mr-2" type="url" placeholder="Link to a markdown file">
-  <button type="button" class="btn btn-primary" onclick="window.location.replace(`${location.pathname}?target=${encodeURIComponent(document.querySelector('#denolithic-it').value)}`)">Denolithic it!</button>
+  <button type="submit" class="btn btn-primary">Denolithic it!</button>
 </form>
 
 ### 👨‍🏫 Presenting slides

@@ -70,6 +70,10 @@ main {
   display: none;
 }
 
+.slide .executor-result {
+  white-space: pre;
+}
+
 .slide .code-actions {
   position: absolute;
   right: 0;

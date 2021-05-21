@@ -168,7 +168,12 @@ async function setup(text) {
     //Handle headers and separators
     if (/^h[1-6r]$/i.test(tag)) {
       slide = new Slide()
+
+      //If previous slide was empty, switch to blankslate
+      if ((empty)&&(slide))
+        slide.classList.add("blankslate")
       empty = true
+
       if (/^h[1-6]$/i.test(tag)) {
         headnav.add(node)
         const previous = Number(nav.slice(-1).shift()?.nodeName.substring(1) ?? 0)

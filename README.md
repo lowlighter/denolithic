@@ -4,34 +4,35 @@
 # 🦕 Denolithic
 
 Denolithic is a powerful markdown powered presentation tool which can transform any markdown file into slides.
+Along with a nice design and controls, you'll be able to run and edit code snippets live and use extended markup features.
 
 ![](https://user-images.githubusercontent.com/22963968/119055511-75bfc800-b9c9-11eb-8adf-5ee3a774b2cb.gif)
 
-[Checkout this `README.md` as denolithic presentation slides for a full experience!](https://denolithic.vercel.app/).
+<!-- [d-comment -->
+This `README.md` is intended to be viewed as a [denolithic presentation slides](https://denolithic.vercel.app), please check it out!
+<!-- d-comment] -->
 
 ## ✨ Features
 - Markdown powered slides, including extended markup features and raw html support
 - Interactive, editable and syntax-colored code blocks
-  - JS and TS code snippetes can even be ran live!
+  - JS and TS code snippets can even be ran live!
 - Smooth design powered by GitHub's primer style
 - Intuitive controls and navigation elements, including linkable slides
 - Metadata support
 
 ## 👨‍🔬 Using denolithic
 
-<!-- [d-comment -->
-This `README.md` is intended to be viewed as denolithic presentation slides.
-
-[Check it out here for a full experience!](https://denolithic.vercel.app/).
-<!-- d-comment] -->
-
 **🌧️ Deploy your own instance with Vercel**
+
+Use [Vercel](https://vercel.com) to deploy your own instance:
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Flowlighter%2Fdenolithic&env=DENO_UNSTABLE&envDescription=Set%20to%20true%20to%20enable%20unstable%20features%20of%20deno%20runtime%20(required%20for%20code%20execution)&project-name=denolithic&repository-name=denolithic&demo-title=Denolithic&demo-description=Create%20presentation%20slides%20from%20markdown&demo-url=https%3A%2F%2Fdenolithic.vercel.app&demo-image=https%3A%2F%2Fdenolithic.vercel.app%2Fstatic%2Fopengraph.png)
 
 <!-- [d-uncomment
 
 **🧪 Test it on your own markdown file!**
+
+Enter an URL to any markdown file to preview it live with denolithic:
 
 <form class="d-flex">
   <input id="denolithic-it" class="form-control flex-1 mr-2" type="url" placeholder="Link to a markdown file">
@@ -42,6 +43,7 @@ This `README.md` is intended to be viewed as denolithic presentation slides.
 
 Each markdown header (`#` to `######`) will create a new slide, with its content as title.
 A slug will also be associated with it so you can share a specific slide link.
+Browser url will automatically be updated to match current slide.
 
 Large sections can be splitted into smaller slides using horizontal rules (`___`).
 In this case, the new slide will inherit title from previous slide
@@ -66,7 +68,7 @@ console.log(`Hello, ${cyan("世界")}`)
 - Use `copy` button to copy code snippet to your clipboard
 - Use `run` button (or <kbd>Ctrl</kbd>+<kbd>Enter</kbd> when focused) to run code snippet
 
-<span class="color-text-secondary">*Process will be killed if it exceeds allowed time execution limit*</span>
+<span class="color-text-secondary">*Process will be killed if it exceeds allowed time execution limit. It is subject to Vercel's serverless function limitations*</span>
 
 ### ✍️ Writing content using markdown
 
@@ -138,7 +140,7 @@ Or use [primer css style](https://primer.style/css/) predefined classes like bel
   </div>
 </div>
 
-### Using meta-tags and meta-data
+### 📦 Using meta-tags and meta-data
 
 The following meta-tags are supported:
 

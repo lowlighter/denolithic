@@ -12,7 +12,7 @@ function page(direction) {
     const pages = document.querySelectorAll(".slides .slide")?.length ?? 0
     const width = window.innerWidth
     const current = Math.round(slides.scrollLeft/width)
-    if (direction)
+    if (typeof direction === "number")
       slides.scroll({left:(current+direction)*width, behavior:"smooth"})
     document.querySelector(".previous_page").setAttribute("aria-disabled", current === 0)
     document.querySelector(".next_page").setAttribute("aria-disabled", current === pages-1)
@@ -20,7 +20,7 @@ function page(direction) {
     document.querySelector("[aria-current='page']").innerText = `${current+1} / ${pages}`
 
     const slide = document.querySelector(`.slides .slide:nth-child(${current+1})`)
-    if ((slide)&&(location.hash !== `#${slide.id}`))
+    if ((slide)&&(typeof direction !== "string")&&(location.hash !== `#${slide.id}`))
       history.replaceState(null, slide.querySelector("h1, h2, h3, h4, h5, h6").innerText, `#${slide.id}`);
   }
 }
@@ -310,7 +310,7 @@ async function setup(text) {
   document.querySelectorAll(".d-none-loading").forEach(element => element.classList.remove("d-none-loading"))
 
   //Set page
-  page()
+  page(location.hash)
 }
 
 /** Load content */

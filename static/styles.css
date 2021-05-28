@@ -70,10 +70,6 @@ main {
   display: none;
 }
 
-.slide .executor-result {
-  white-space: pre;
-}
-
 .slide .code-actions {
   position: absolute;
   right: 0;
@@ -86,6 +82,10 @@ main {
 
 .slide .code-actions button:not(:last-child) {
   margin-right: 0 !important;
+}
+
+.slide .executor-button[disabled] {
+  cursor: progress;
 }
 
 /* Footnotes */

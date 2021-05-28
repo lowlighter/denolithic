@@ -6,7 +6,7 @@ function slug(text) {
 }
 
 /** Page selector */
-function page(direction) {
+function page(direction, {updateState = true} = {}) {
   const slides = document.querySelector(".slides")
   if (slides) {
     const pages = document.querySelectorAll(".slides .slide")?.length ?? 0
@@ -20,7 +20,7 @@ function page(direction) {
     document.querySelector("[aria-current='page']").innerText = `${current+1} / ${pages}`
 
     const slide = document.querySelector(`.slides .slide:nth-child(${current+1})`)
-    if ((slide)&&(location.hash !== `#${slide.id}`))
+    if ((slide)&&(updateState)&&(location.hash !== `#${slide.id}`))
       history.replaceState(null, slide.querySelector("h1, h2, h3, h4, h5, h6").innerText, `#${slide.id}`);
   }
 }
@@ -329,6 +329,7 @@ async function setup(text) {
   document.querySelectorAll(".d-none-loading").forEach(element => element.classList.remove("d-none-loading"))
 
   //Set page
+  page(undefined, {updateState:false})
   document.querySelector(`a[href="${location.hash}"]`)?.click()
 }
 

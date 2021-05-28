@@ -163,6 +163,14 @@ d-uncomment] -->
 * Suggest new features or request help through [discussions](https://github.com/lowlighter/metrics/discussions)
 * To contribute, [fork this repository](https://github.com/lowlighter/denolithic/network/members) and submit a [pull request](https://github.com/lowlighter/denolithic/pulls)
 
+**Developping locally**
+
+Setup [vercel cli](https://vercel.com/cli) and launch it in project's root:
+```
+npm i -g vercel
+vercel dev
+```
+
 ## 📜 License
 
 > MIT License<br>

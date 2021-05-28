@@ -44,6 +44,14 @@ main {
   border-radius: 0;
 }
 
+/* Slides interludes */
+.slide .interlude h1, .slide .interlude h2, .slide .interlude h3, .slide .interlude h4, .slide .interlude h5, .slide .interlude h6 {
+  text-align: center;
+  border: none !important;
+  font-size: 2em;
+  margin: 25% 0;
+}
+
 /* Slides code snippets */
 
 .slide pre {

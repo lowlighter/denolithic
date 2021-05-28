@@ -172,9 +172,9 @@ async function setup(text) {
 
     //Handle headers and separators
     if (/^h[1-6r]$/i.test(tag)) {
-      //If previous slide was empty, switch to blankslate
+      //If previous slide was empty, switch to interlude
       if ((empty)&&(slide))
-        slide.classList.add("blankslate")
+        slide.classList.add("interlude")
 
       slide = new Slide()
       empty = true

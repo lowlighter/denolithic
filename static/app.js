@@ -20,7 +20,7 @@ function page(direction) {
     document.querySelector("[aria-current='page']").innerText = `${current+1} / ${pages}`
 
     const slide = document.querySelector(`.slides .slide:nth-child(${current+1})`)
-    if ((slide)&&(typeof direction !== "string")&&(location.hash !== `#${slide.id}`))
+    if ((slide)&&(location.hash !== `#${slide.id}`))
       history.replaceState(null, slide.querySelector("h1, h2, h3, h4, h5, h6").innerText, `#${slide.id}`);
   }
 }
@@ -320,7 +320,7 @@ async function setup(text) {
   document.querySelectorAll(".d-none-loading").forEach(element => element.classList.remove("d-none-loading"))
 
   //Set page
-  page(location.hash)
+  document.querySelector(`a[href="${location.hash}"]`)?.click()
 }
 
 /** Load content */

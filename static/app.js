@@ -111,18 +111,28 @@ async function setup(text) {
   }
 
   /** Code editor */
-  function vim({target, key, ctrlKey}) {
-    //Hightlight code
+  function vim({target, key, ctrlKey}, {timeout = 20, resize = (key === "Enter")} = {}) {
+    //Resize
+    if (resize) {
+      target.style.height = `${target.parentNode.querySelector("code").scrollHeight}px`
+      target.style.width = `${target.parentNode.querySelector("code").scrollWidth}px`
+    }
+    //Highlight code
     try {
       const language = [...target.classList].filter(key => /^language-/.test(key)).shift()?.replace(/^language-/, "")
       if (hljs.getLanguage(language)) {
-        target.parentNode.querySelector("code:not(.editor)").innerHTML = hljs.highlight(target.innerText, {language, ignoreIllegals:true}).value
+        clearTimeout(vim.timeout.get(target))
+        vim.timeout.set(target, setTimeout(() => target.parentNode.querySelector("code").innerHTML = hljs.highlight(target.value, {language, ignoreIllegals:true}).value, timeout))
       }
     } catch {}
     //Handle code execution shortcut
     if ((key === "Enter")&&(ctrlKey))
       execute(target.parentNode.getAttribute("data-executor-uuid"))
+    //Unfocus editor on escape
+    if (key === "Escape")
+      document.activeElement.blur()
   }
+  vim.timeout = new Map()
 
   //Compute render
   const nav = []
@@ -213,13 +223,12 @@ async function setup(text) {
     if (/^pre$/i.test(tag)) {
       //Create code editor
       const code = node.querySelector("code")
-      const editor = document.createElement("code")
+      const editor = document.createElement("textarea")
       const initalContent = code.innerText
       const language = [...code.classList].filter(key => /^language-/.test(key)).shift()?.replace(/^language-/, "")
       editor.classList.add("editor", ...code.classList)
-      editor.setAttribute("contenteditable", true)
       editor.setAttribute("spellcheck", false)
-      editor.innerHTML = code.innerHTML ?? ""
+      editor.value = code.innerHTML ?? ""
       editor.addEventListener("keyup", vim)
       editor.addEventListener("keydown", event => event.stopPropagation())
       //Create executor result
@@ -236,9 +245,9 @@ async function setup(text) {
       reset.classList.add("btn", "btn-sm", "primary", "copy-button", "m-2")
       reset.setAttribute("type", "button")
       reset.addEventListener("click", () => {
-        editor.innerHTML = initalContent
+        editor.value = initalContent
         code.innerHTML = initalContent
-        vim({target:code})
+        vim({target:editor}, {timeout:0, resize:true})
       })
       reset.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path fill-rule="evenodd" d="M8 2.5a5.487 5.487 0 00-4.131 1.869l1.204 1.204A.25.25 0 014.896 6H1.25A.25.25 0 011 5.75V2.104a.25.25 0 01.427-.177l1.38 1.38A7.001 7.001 0 0114.95 7.16a.75.75 0 11-1.49.178A5.501 5.501 0 008 2.5zM1.705 8.005a.75.75 0 01.834.656 5.501 5.501 0 009.592 2.97l-1.204-1.204a.25.25 0 01.177-.427h3.646a.25.25 0 01.25.25v3.646a.25.25 0 01-.427.177l-1.38-1.38A7.001 7.001 0 011.05 8.84a.75.75 0 01.656-.834z"></path></svg>`
       actions.appendChild(reset)
@@ -262,7 +271,7 @@ async function setup(text) {
       node.prepend(editor)
       node.appendChild(actions)
       node.setAttribute("data-executor-uuid", uuid)
-      vim({target:code})
+      vim({target:editor}, {timeout:0, resize:true})
     }
   }
 

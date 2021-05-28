@@ -63,11 +63,20 @@ main {
   display: inline-block;
 }
 
-.slide pre code.editor {
+.slide pre .editor {
   position: absolute;
   color: transparent;
+  margin: 0;
+  padding: 0;
+  white-space: pre;
   width: calc(100% - 32px);
   caret-color: var(--color-text-primary);
+  background: transparent;
+  border: none;
+  resize: none;
+}
+.slide pre .editor:focus {
+  outline: none;
 }
 
 .slide pre code:focus {

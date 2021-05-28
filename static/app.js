@@ -126,7 +126,7 @@ async function setup(text) {
   const render = document.createElement("div")
   render.innerHTML = markdown.render(text)
   const nodes = Array.from(render.childNodes)
-  let slide = null, empty = true, footnotes = null, commented = false
+  let slide = null, empty = false, footnotes = null, commented = false
   while (nodes.length) {
     const node = nodes.shift()
     const {nodeName:tag} = node
@@ -167,11 +167,11 @@ async function setup(text) {
 
     //Handle headers and separators
     if (/^h[1-6r]$/i.test(tag)) {
-      slide = new Slide()
-
       //If previous slide was empty, switch to blankslate
       if ((empty)&&(slide))
         slide.classList.add("blankslate")
+
+      slide = new Slide()
       empty = true
 
       if (/^h[1-6]$/i.test(tag)) {
@@ -200,7 +200,8 @@ async function setup(text) {
     }
 
     //Handle other nodes
-    empty = false
+    if (`${node.innerText ?? node.textContent ?? ""}`.trim().length)
+      empty = false
     slide?.appendChild(node)
 
     //Handle code blocks

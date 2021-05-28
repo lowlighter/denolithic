@@ -157,6 +157,12 @@ Meta-data :
 
 d-uncomment] -->
 
+## 💪 Contributing
+
+* Report bugs by filling an [issue](https://github.com/lowlighter/denolithic/issues)
+* Suggest new features or request help through [discussions](https://github.com/lowlighter/metrics/discussions)
+* To contribute, [fork this repository](https://github.com/lowlighter/denolithic/network/members) and submit a [pull request](https://github.com/lowlighter/denolithic/pulls)
+
 ## 📜 License
 
 > MIT License<br>

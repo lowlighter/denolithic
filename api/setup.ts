@@ -3,7 +3,7 @@ import { parse,  stringify } from "https://deno.land/std@0.97.0/encoding/yaml.ts
 import { DOMParser, Element } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts";
 
 //Load static/base.html
-let html: any = new DOMParser().parseFromString(await Deno.readTextFile("./static/base.html"), "text/html")
+let html: any = new DOMParser().parseFromString(await Deno.readTextFile("./template/index.html"), "text/html")
 
 //Load config.yml
 let config: any = parse(await Deno.readTextFile("./config.yml"))

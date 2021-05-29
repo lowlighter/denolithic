@@ -13,8 +13,8 @@ export default async function (request: ServerRequest) {
   try {
     const directory = []
     const base = toFileUrl(resolve(dirname(fromFileUrl(import.meta.url)), ".."))
-    for await (const { path, isFile } of expandGlob("slides/**/*.md")) {
-      if (!isFile)
+    for await (const { path, isFile, name } of expandGlob("slides/**/*.md")) {
+      if ((!isFile)||(name.charAt(0) === "_"))
         continue
       const urn = toFileUrl(path).href.replace(base.href, "")
       directory.push({path:urn})

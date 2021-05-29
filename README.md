@@ -1,5 +1,7 @@
-<!-- [d-meta] title: Denolithic preview -->
+<!-- [d-meta] title: Denolithic -->
 <!-- [d-meta] author: lowlighter -->
+<!-- [d-meta] menu-link: [Source](https://github.com/lowlighter/denolithic) -->
+<!-- [d-meta] menu-link: [Sponsor](https://github.com/sponsors/lowlighter) -->
 
 # 🦕 Denolithic
 

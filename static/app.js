@@ -184,7 +184,9 @@ async function setup(text) {
       //Meta
       if (/^\s*\[d-meta\]\s+(?<key>[^:]*):\s+(?<value>[\s\S]*)/.test(content)) {
         const {key = "", value = ""} = content.match(/^\s*\[d-meta\]\s+(?<key>[^:]*):\s+(?<value>[\s\S]*)/)?.groups ?? {}
-        meta.set(key.trim(), value.trim())
+        if (!meta.has(key))
+          meta.set(key.trim(), [])
+        meta.get(key.trim())?.push(value.trim())
         continue
       }
 
@@ -368,8 +370,22 @@ async function setup(text) {
 
   function Meta(data) {
     if (data.has("title")) {
-      document.querySelector(".meta-title").innerText = data.get("title")
+      document.querySelector(".meta-title").innerText = data.get("title").shift() ?? ""
       document.title = data.get("title")
+    }
+    if (data.has("menu-link")) {
+      document.querySelector(".d-title").after(...data.get("menu-link").map(link => {
+        const item = document.createElement("div")
+        item.classList.add("Header-item")
+        item.innerHTML = markdown.render(link)
+        item.innerHTML = item.querySelector("p").innerHTML
+        const a = item.querySelector("a")
+        if (a) {
+          a.classList.add("Header-link")
+          a.target = "_blank"
+        }
+        return item
+      }))
     }
   }
   Meta(meta)

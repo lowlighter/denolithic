@@ -1,7 +1,6 @@
 //Imports
-import { parse,  stringify } from "https://deno.land/std@0.97.0/encoding/yaml.ts";
-import { DOMParser, Element } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts";
-//import "https://deno.land/x/file_fetch@0.1.0/polyfill.ts";
+import { parse } from "https://deno.land/std@0.97.0/encoding/yaml.ts";
+import { DOMParser } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts";
 
 //Create a new DOM element with the given attributes
 function setElement(type: string, attrs: any){
@@ -11,20 +10,14 @@ function setElement(type: string, attrs: any){
     return elem
 }
 
-console.log(Deno.cwd())
-try { console.log(await Deno.stat("./templates/index.html")) } catch (error) { console.log(error) }
-try { console.log(await Deno.stat(`${Deno.cwd()}/templates/index.html`)) } catch (error) { console.log(error) }
-console.log(await Deno.stat(`${Deno.cwd()}/templates/index.html`))
-
-try { console.log(await Deno.readTextFile(`${Deno.cwd()}/templates/index.html`)) } catch (error) { console.log(error) }
-try { console.log(await Deno.writeTextFile(`${Deno.cwd()}/index.html`, "hello world")) } catch (error) { console.log(error) }
-try { console.log(await fetch("https://raw.githubusercontent.com/lowlighter/denolithic/main/templates/index.html").then(response => response.text())) } catch (error) { console.log(error) }
-
 //Load static/base.html
-let html: any = new DOMParser().parseFromString(await Deno.readTextFile(`${Deno.cwd()}/templates/index.html`), "text/html")
+const index = await fetch("https://raw.githubusercontent.com/lowlighter/denolithic/main/templates/index.html").then(response => response.text())
+//await Deno.readTextFile(`${Deno.cwd()}/templates/index.html`)
+let html: any = new DOMParser().parseFromString(index, "text/html")
 
 //Load config.yml
-let config: any = parse(await Deno.readTextFile(`${Deno.cwd()}/config.yml`))
+const _config = await fetch("https://raw.githubusercontent.com/lowlighter/denolithic/main/templates/index.html").then(response => response.text())
+let config: any = parse(_config)
 
 //Set company name
 if(config["name"]){

@@ -200,6 +200,15 @@ async function setup(text) {
         continue
       }
 
+      //Include directive
+      if (/^\s*\[d-include\]\s+(?<slides>[\s\S]*)/.test(content)) {
+        const {slides} = content.match(/^\s*\[d-include\]\s+(?<slides>[\s\S]*)/)?.groups ?? {}
+        const render = document.createElement("div")
+        render.innerHTML = markdown.render(await fetch(slides).then(response => response.text()))
+        nodes.unshift(...Array.from(render.childNodes))
+        continue
+      }
+
       //Un comment in-between
       if (/^\s*\[d-uncomment\s*\n(?<text>[\s\S]*?)\nd-uncomment\]\s*$/.test(content)) {
         const {text = ""} = content.match(/^\s*\[d-uncomment\s*\n(?<text>[\s\S]*?)\nd-uncomment\]\s*$/)?.groups ?? {}

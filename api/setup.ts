@@ -14,7 +14,7 @@ if(config["name"]){
 }
 
 //Set custom css
-config["styles"]!.forEach((stylePath: string ) => {
+config["styles"]?.forEach((stylePath: string ) => {
     let attrs = {
         "href" : "static/" + stylePath,
         "rel": "stylesheet"

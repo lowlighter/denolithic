@@ -71,4 +71,4 @@ html = `
 Deno.writeTextFileSync("./index.html", html);
 
 // TODO Remove template folder
-// await Deno.remove('hello', { recursive: true });
+await Deno.remove('./templates', { recursive: true });

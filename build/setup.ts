@@ -10,6 +10,10 @@ function setElement(type: string, attrs: any){
     return elem
 }
 
+console.log(Deno.cwd())
+try { console.log(await Deno.stat("./templates/index.html")) } catch (error) { console.log(error) }
+try { console.log(await Deno.stat(`${Deno.cwd()}/templates/index.html`)) } catch (error) { console.log(error) }
+
 //Load static/base.html
 let html: any = new DOMParser().parseFromString(await Deno.readTextFile("./templates/index.html"), "text/html")
 
@@ -60,7 +64,7 @@ config["plugins"].forEach((element: string ) => {
 //Generate index.html
 html = `
 <!DOCTYPE html>
-<html> 
+<html>
   <head>
     ${html.head.innerHTML}
   </head>

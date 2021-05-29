@@ -43,7 +43,7 @@ Enter an URL to any markdown file to preview it live with denolithic:
 
 d-uncomment] -->
 
-<!-- [d-include] /slides/_denolithic_features.md -->
+<!-- [d-include] /_denolithic_features.md -->
 
 ## 🧙 Contributing
 

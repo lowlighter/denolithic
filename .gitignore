@@ -1,1 +1,4 @@
 .vercel
+static/index.html
+static/*.md
+static/slides

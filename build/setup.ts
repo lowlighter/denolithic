@@ -1,6 +1,7 @@
 //Imports
 import { parse } from "https://deno.land/std@0.97.0/encoding/yaml.ts";
 import { DOMParser } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts";
+import { copy, copySync } from "https://deno.land/std@0.97.0/fs/mod.ts";
 
 //Create a new DOM element with the given attributes
 function setElement(type: string, attrs: any){
@@ -71,7 +72,8 @@ html = `
    ${html.body.innerHTML}
   </body>
  </html>`;
-Deno.writeTextFileSync(`${Deno.cwd()}/static/index.html`, html);
+await Deno.writeTextFileSync(`${Deno.cwd()}/static/index.html`, html);
 
-// TODO Remove template folder
-await Deno.remove('./templates', { recursive: true });
+
+await copy(`${Deno.cwd()}/README.md`, `${Deno.cwd()}/static/README.md`, {overwrite: true})
+await copy(`${Deno.cwd()}/slides`, `${Deno.cwd()}/static/`, {overwrite: true})

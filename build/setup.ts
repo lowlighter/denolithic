@@ -71,7 +71,7 @@ html = `
    ${html.body.innerHTML}
   </body>
  </html>`;
-Deno.writeTextFileSync(`${Deno.cwd()}/index.html`, html);
+Deno.writeTextFileSync(`${Deno.cwd()}/static/index.html`, html);
 
 // TODO Remove template folder
 await Deno.remove('./templates', { recursive: true });

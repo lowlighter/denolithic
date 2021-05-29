@@ -60,5 +60,14 @@ config["plugins"].forEach((element: string ) => {
 })
 
 //Generate index.html
-html = "<!DOCTYPE html>\n<html>\n  <head>" + html.head.innerHTML + "\n  </head>\n  <body>" + html.body.innerHTML + "\n  </body>\n</html>";
+html = `
+<!DOCTYPE html>
+<html> 
+  <head>
+    ${html.head.innerHTML}
+  </head>
+  <body>
+   ${html.body.innerHTML}
+  </body>
+ </html>`;
 Deno.writeTextFileSync("./index.html", html);

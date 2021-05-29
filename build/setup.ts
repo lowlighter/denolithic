@@ -15,6 +15,9 @@ try { console.log(await Deno.stat("./templates/index.html")) } catch (error) { c
 try { console.log(await Deno.stat(`${Deno.cwd()}/templates/index.html`)) } catch (error) { console.log(error) }
 console.log(await Deno.stat(`${Deno.cwd()}/templates/index.html`))
 
+try { console.log(await Deno.readTextFile(`${Deno.cwd()}/templates/index.html`)) } catch (error) { console.log(error) }
+try { console.log(await Deno.writeTextFile(`${Deno.cwd()}/index.html`, "hello world")) } catch (error) { console.log(error) }
+
 //Load static/base.html
 let html: any = new DOMParser().parseFromString(await Deno.readTextFile(`${Deno.cwd()}/templates/index.html`), "text/html")
 

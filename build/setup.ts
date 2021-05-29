@@ -1,6 +1,6 @@
 //Imports
-import { parse,  stringify } from "https://deno.land/std@0.97.0/encoding/yaml.ts";
-import { DOMParser, Element } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts";
+import { parse } from "https://deno.land/std@0.97.0/encoding/yaml.ts";
+import { DOMParser } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts";
 
 //Create a new DOM element with the given attributes
 function setElement(type: string, attrs: any){
@@ -11,10 +11,13 @@ function setElement(type: string, attrs: any){
 }
 
 //Load static/base.html
-let html: any = new DOMParser().parseFromString(await Deno.readTextFile("./templates/index.html"), "text/html")
+const index = await fetch("https://raw.githubusercontent.com/lowlighter/denolithic/main/templates/index.html").then(response => response.text())
+//await Deno.readTextFile(`${Deno.cwd()}/templates/index.html`)
+let html: any = new DOMParser().parseFromString(index, "text/html")
 
 //Load config.yml
-let config: any = parse(await Deno.readTextFile("./config.yml"))
+const _config = await fetch("https://raw.githubusercontent.com/lowlighter/denolithic/main/config.yml").then(response => response.text())
+let config: any = parse(_config)
 
 //Set company name
 if(config["name"]){
@@ -60,7 +63,7 @@ config["plugins"].forEach((element: string ) => {
 //Generate index.html
 html = `
 <!DOCTYPE html>
-<html> 
+<html>
   <head>
     ${html.head.innerHTML}
   </head>
@@ -68,7 +71,7 @@ html = `
    ${html.body.innerHTML}
   </body>
  </html>`;
-Deno.writeTextFileSync("./index.html", html);
+Deno.writeTextFileSync(`${Deno.cwd()}/static/index.html`, html);
 
 // TODO Remove template folder
 await Deno.remove('./templates', { recursive: true });

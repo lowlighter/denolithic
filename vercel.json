@@ -2,6 +2,14 @@
   "functions": {
     "api/**/*.ts": { "runtime": "vercel-deno@0.7.12" }
   },
+  "build": {
+    "env": {
+      "DENO_UNSTABLE": "true"
+    }
+  },
+  "env": {
+    "DENO_UNSTABLE": "true"
+  },
   "github":{
     "silent": true,
     "autoJobCancelation": true

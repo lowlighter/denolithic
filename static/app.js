@@ -17,12 +17,14 @@ function page(direction, {updateState = true} = {}) {
     const current = Math.round(slides.scrollLeft/width)
 
     //Update interface
-    if (typeof direction === "number")
-      slides.scroll({left:(current+direction)*width, behavior:"smooth"})
     document.querySelector(".previous_page").setAttribute("aria-disabled", current === 0)
     document.querySelector(".next_page").setAttribute("aria-disabled", current === pages-1)
     document.querySelector(".slides-progress > *").style.width = `${(100*slides.scrollLeft/((pages-1)*width)).toFixed(1)}%`
     document.querySelector("[aria-current='page']").innerText = `${current+1} / ${pages}`
+
+    //Scroll
+    if (typeof direction === "number")
+      document.querySelector(`.slides .slide:nth-child(${current+direction+1})`)?.scrollIntoView({behavior:"smooth"})
 
     //Update state
     const slide = document.querySelector(`.slides .slide:nth-child(${current+1})`)

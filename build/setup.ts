@@ -16,7 +16,7 @@ const index = await fetch("https://raw.githubusercontent.com/lowlighter/denolith
 let html: any = new DOMParser().parseFromString(index, "text/html")
 
 //Load config.yml
-const _config = await fetch("https://raw.githubusercontent.com/lowlighter/denolithic/main/templates/index.html").then(response => response.text())
+const _config = await fetch("https://raw.githubusercontent.com/lowlighter/denolithic/main/config.yml").then(response => response.text())
 let config: any = parse(_config)
 
 //Set company name

@@ -1,5 +1,7 @@
 const SUPPORTED_LANGUAGES = /js|ts|javascript|typescript/i
 
+const LISTENERS = {enter:new Map(), leave:new Map()}
+
 /** Transform into slug */
 function slug(text) {
   return text.replace(/[^\w]/g, "-").replace(/-+/g, "-").replace(/(^-)|(-$)/, "").toLocaleLowerCase()
@@ -7,11 +9,14 @@ function slug(text) {
 
 /** Page selector */
 function page(direction, {updateState = true} = {}) {
+  //Load slides
   const slides = document.querySelector(".slides")
   if (slides) {
     const pages = document.querySelectorAll(".slides .slide")?.length ?? 0
     const width = window.innerWidth
     const current = Math.round(slides.scrollLeft/width)
+
+    //Update interface
     if (typeof direction === "number")
       slides.scroll({left:(current+direction)*width, behavior:"smooth"})
     document.querySelector(".previous_page").setAttribute("aria-disabled", current === 0)
@@ -19,12 +24,37 @@ function page(direction, {updateState = true} = {}) {
     document.querySelector(".slides-progress > *").style.width = `${(100*slides.scrollLeft/((pages-1)*width)).toFixed(1)}%`
     document.querySelector("[aria-current='page']").innerText = `${current+1} / ${pages}`
 
+    //Update state
     const slide = document.querySelector(`.slides .slide:nth-child(${current+1})`)
     if ((slide)&&(updateState)&&(location.hash !== `#${slide.id}`))
       history.replaceState(null, slide.querySelector("h1, h2, h3, h4, h5, h6").innerText, `#${slide.id}`);
+
+    //Apply events
+    if (page.previous !== slide.id) {
+      LISTENERS.leave.get(page.previous)?.()
+      debounce.timeouts.forEach(clearTimeout)
+      debounce(LISTENERS.enter.get(slide.id))
+    }
+    page.previous = slide.id
   }
 }
-document.querySelector(".slides").addEventListener("scroll", () => page())
+page.previous = null
+
+function debounce(func, {time = 200} = {}) {
+  if (func) {
+    clearTimeout(debounce.timeouts.get(func))
+    debounce.timeouts.set(func, setTimeout(func, time))
+  }
+}
+debounce.timeouts = new Map()
+
+
+let ticking = false
+document.querySelector(".slides").addEventListener("scroll", () => {
+  if (!ticking)
+    requestAnimationFrame(() => (page(), ticking = false))
+  ticking = true
+})
 document.addEventListener("keydown", event => {
   switch (event.key) {
     case "ArrowLeft": return page(-1)
@@ -220,6 +250,16 @@ async function setup(text) {
     if (/^style$/i.test(tag)) {
       node.innerText = node.innerText.replace(/:scope/g, `#${scope}`)
       slide?.appendChild(node)
+      continue
+    }
+
+    //Scripts
+    if (/^script$/i.test(tag)) {
+      const {enter = null, leave = null} = await eval(`(async function() { return ${node.innerText.trimStart()} })()`) ?? {}
+      if (enter)
+        LISTENERS.enter.set(scope, enter)
+      if (leave)
+        LISTENERS.leave.set(scope, leave)
       continue
     }
 

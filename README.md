@@ -55,7 +55,7 @@ Navigate through slides using:
 - Arrow keys <kbd>←</kbd> and <kbd>→</kbd>
 - `Previous` and `Next` buttons *(located at the bottom of page)*
 
-### 💻 Embedding code blocks
+### 👨‍💻 Embedding code blocks
 
 Code blocks are syntax-colored, content editable, copy-pastable and runnable
 
@@ -70,7 +70,7 @@ console.log(`Hello, ${cyan("世界")}`)
 
 <span class="color-text-secondary">*Process will be killed if it exceeds allowed time execution limit. It is subject to Vercel's serverless function limitations*</span>
 
-### ✍️ Writing content using markdown
+### 👷 Writing content using markdown
 
 *[ABBREVIATION]: This details abbreviation
 [^1]: This is Jojo reference
@@ -110,7 +110,7 @@ Important concept
 Display `info`, `warn`, `error` and `success` messages using triple colons `:::`
 :::
 
-### ✍️ Writing content using raw HTML
+### 👷 Writing content using raw HTML
 
 It is also possible to use html tags for complex content like <kbd>keyboard keys</kbd>, <sup>superscript</sup> or <sub>subscript</sub> texts, etc.
 
@@ -140,16 +140,18 @@ Or use [primer css style](https://primer.style/css/) predefined classes like bel
   </div>
 </div>
 
-### 🎨 Styling slides
+### 👨‍🎨 Styling slides
 
 When using `<style>` tags, [`:scope`](https://developer.mozilla.org/en-US/docs/Web/CSS/:scope) will be automatically changed to current slide:
 
 ```css
-:scope .gradient-animated {
-  animation: gradient-animation 10s ease-in-out infinite;
-  background: linear-gradient(-60deg, #16BFFD, #16BFFD, #CB3066, #CB3066);
-  background-clip: text;
-}
+<style>
+  :scope .gradient-animated {
+    animation: gradient-animation 10s ease-in-out infinite;
+    background: linear-gradient(-60deg, #16BFFD, #16BFFD, #CB3066, #CB3066);
+    background-clip: text;
+  }
+</style>
 ```
 
 ```html
@@ -182,7 +184,41 @@ Note that if you do not precede your rules by `:scope` selector, these will be a
   }
 </style>
 
-### 📦 Using meta-tags and meta-data
+### 👨‍🏭 Scripting slides
+
+Each slide supports a limited set of events, which can be listened to execute small JavaScript snippets.
+To use this feature, embed a `script` tag which returns an object:
+```html
+<script>
+  {
+    enter() { /* Execute code when entering slide */ },
+    leave() { /* Execute code when leaving slide */ },
+  }
+</script>
+```
+
+You can use it for small interactions like `<canvas>` drawing or confetti popping 🎉 !
+
+::: error
+Note that code is actually interpreted through [`eval`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval) so pay attention to what you're running when using this
+:::
+
+<script>
+  {
+    async enter() {
+      if (!window.confetti) {
+        const script = document.createElement("script")
+        script.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"
+        document.querySelector("body").append(script)
+        await new Promise((solve) => script.addEventListener("load", solve))
+      }
+      for (const {angle, x} of [{angle:60, x:0}, {angle:120, x:1}])
+        confetti({particleCount:50, spread:55, angle, origin:{x}})
+    },
+  }
+</script>
+
+### 🤵 Using meta-tags and meta-data
 
 The following meta-tags are supported:
 
@@ -194,12 +230,13 @@ The following meta-tags are supported:
 
 These can be used to describe what should be ignored by classic markdown renderers and what should be displayed by denolithic.
 
-Meta-data :
+Supported meta-data :
 - `title` sets both html and header title
+- `author` sets author name
 
 d-uncomment] -->
 
-## 💪 Contributing
+## 🧙 Contributing
 
 * Report bugs by filling an [issue](https://github.com/lowlighter/denolithic/issues)
 * Suggest new features or request help through [discussions](https://github.com/lowlighter/denolithic/discussions)
@@ -213,7 +250,7 @@ npm i -g vercel
 vercel dev
 ```
 
-## 📜 License
+## 👨‍⚖️ License
 
 > MIT License<br>
 > Copyright (c) 2021-present [@lowlighter](https://github.com/lowlighter)

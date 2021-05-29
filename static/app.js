@@ -122,7 +122,8 @@ async function setup(text) {
       const language = [...target.classList].filter(key => /^language-/.test(key)).shift()?.replace(/^language-/, "")
       if (hljs.getLanguage(language)) {
         clearTimeout(vim.timeout.get(target))
-        vim.timeout.set(target, setTimeout(() => target.parentNode.querySelector("code").innerHTML = hljs.highlight(target.value, {language, ignoreIllegals:true}).value, timeout))
+        const value = new DOMParser().parseFromString(target.value, "text/html").documentElement.textContent
+        vim.timeout.set(target, setTimeout(() => target.parentNode.querySelector("code").innerHTML = hljs.highlight(value, {language, ignoreIllegals:true}).value, timeout))
       }
     } catch {}
     //Handle code execution shortcut

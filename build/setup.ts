@@ -13,12 +13,13 @@ function setElement(type: string, attrs: any){
 console.log(Deno.cwd())
 try { console.log(await Deno.stat("./templates/index.html")) } catch (error) { console.log(error) }
 try { console.log(await Deno.stat(`${Deno.cwd()}/templates/index.html`)) } catch (error) { console.log(error) }
+console.log(await Deno.stat(`${Deno.cwd()}/templates/index.html`))
 
 //Load static/base.html
-let html: any = new DOMParser().parseFromString(await Deno.readTextFile("./templates/index.html"), "text/html")
+let html: any = new DOMParser().parseFromString(await Deno.readTextFile(`${Deno.cwd()}/templates/index.html`), "text/html")
 
 //Load config.yml
-let config: any = parse(await Deno.readTextFile("./config.yml"))
+let config: any = parse(await Deno.readTextFile(`${Deno.cwd()}/config.yml`))
 
 //Set company name
 if(config["name"]){
@@ -72,7 +73,7 @@ html = `
    ${html.body.innerHTML}
   </body>
  </html>`;
-Deno.writeTextFileSync("./index.html", html);
+Deno.writeTextFileSync(`${Deno.cwd()}/index.html`, html);
 
 // TODO Remove template folder
 await Deno.remove('./templates', { recursive: true });

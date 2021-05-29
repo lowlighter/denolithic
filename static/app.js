@@ -1,5 +1,7 @@
 const SUPPORTED_LANGUAGES = /js|ts|javascript|typescript/i
 
+const LISTENERS = {enter:new Map(), leave:new Map()}
+
 /** Transform into slug */
 function slug(text) {
   return text.replace(/[^\w]/g, "-").replace(/-+/g, "-").replace(/(^-)|(-$)/, "").toLocaleLowerCase()
@@ -7,24 +9,54 @@ function slug(text) {
 
 /** Page selector */
 function page(direction, {updateState = true} = {}) {
+  //Load slides
   const slides = document.querySelector(".slides")
   if (slides) {
     const pages = document.querySelectorAll(".slides .slide")?.length ?? 0
     const width = window.innerWidth
     const current = Math.round(slides.scrollLeft/width)
-    if (typeof direction === "number")
-      slides.scroll({left:(current+direction)*width, behavior:"smooth"})
+
+    //Update interface
     document.querySelector(".previous_page").setAttribute("aria-disabled", current === 0)
     document.querySelector(".next_page").setAttribute("aria-disabled", current === pages-1)
     document.querySelector(".slides-progress > *").style.width = `${(100*slides.scrollLeft/((pages-1)*width)).toFixed(1)}%`
     document.querySelector("[aria-current='page']").innerText = `${current+1} / ${pages}`
 
+    //Scroll
+    if (typeof direction === "number")
+      document.querySelector(`.slides .slide:nth-child(${current+direction+1})`)?.scrollIntoView({behavior:"smooth"})
+
+    //Update state
     const slide = document.querySelector(`.slides .slide:nth-child(${current+1})`)
     if ((slide)&&(updateState)&&(location.hash !== `#${slide.id}`))
       history.replaceState(null, slide.querySelector("h1, h2, h3, h4, h5, h6").innerText, `#${slide.id}`);
+
+    //Apply events
+    if (page.previous !== slide.id) {
+      LISTENERS.leave.get(page.previous)?.()
+      debounce.timeouts.forEach(clearTimeout)
+      debounce(LISTENERS.enter.get(slide.id))
+    }
+    page.previous = slide.id
   }
 }
-document.querySelector(".slides").addEventListener("scroll", () => page())
+page.previous = null
+
+function debounce(func, {time = 200} = {}) {
+  if (func) {
+    clearTimeout(debounce.timeouts.get(func))
+    debounce.timeouts.set(func, setTimeout(func, time))
+  }
+}
+debounce.timeouts = new Map()
+
+
+let ticking = false
+document.querySelector(".slides").addEventListener("scroll", () => {
+  if (!ticking)
+    requestAnimationFrame(() => (page(), ticking = false))
+  ticking = true
+})
 document.addEventListener("keydown", event => {
   switch (event.key) {
     case "ArrowLeft": return page(-1)
@@ -122,7 +154,8 @@ async function setup(text) {
       const language = [...target.classList].filter(key => /^language-/.test(key)).shift()?.replace(/^language-/, "")
       if (hljs.getLanguage(language)) {
         clearTimeout(vim.timeout.get(target))
-        vim.timeout.set(target, setTimeout(() => target.parentNode.querySelector("code").innerHTML = hljs.highlight(target.value, {language, ignoreIllegals:true}).value, timeout))
+        const value = new DOMParser().parseFromString(target.value, "text/html").documentElement.textContent
+        vim.timeout.set(target, setTimeout(() => target.parentNode.querySelector("code").innerHTML = hljs.highlight(value, {language, ignoreIllegals:true}).value, timeout))
       }
     } catch {}
     //Handle code execution shortcut
@@ -141,7 +174,7 @@ async function setup(text) {
   const render = document.createElement("div")
   render.innerHTML = markdown.render(text)
   const nodes = Array.from(render.childNodes)
-  let slide = null, empty = false, footnotes = null, commented = false
+  let slide = null, empty = false, footnotes = null, commented = false, scope = null
   while (nodes.length) {
     const node = nodes.shift()
     const {nodeName:tag} = node
@@ -153,7 +186,9 @@ async function setup(text) {
       //Meta
       if (/^\s*\[d-meta\]\s+(?<key>[^:]*):\s+(?<value>[\s\S]*)/.test(content)) {
         const {key = "", value = ""} = content.match(/^\s*\[d-meta\]\s+(?<key>[^:]*):\s+(?<value>[\s\S]*)/)?.groups ?? {}
-        meta.set(key.trim(), value.trim())
+        if (!meta.has(key))
+          meta.set(key.trim(), [])
+        meta.get(key.trim())?.push(value.trim())
         continue
       }
 
@@ -164,6 +199,15 @@ async function setup(text) {
       }
       if (/^\s*d-comment\]\s*$/.test(content)) {
         commented = false
+        continue
+      }
+
+      //Include directive
+      if (/^\s*\[d-include\]\s+(?<slides>[\s\S]*)/.test(content)) {
+        const {slides} = content.match(/^\s*\[d-include\]\s+(?<slides>[\s\S]*)/)?.groups ?? {}
+        const render = document.createElement("div")
+        render.innerHTML = markdown.render(await fetch(slides).then(response => response.text()))
+        nodes.unshift(...Array.from(render.childNodes))
         continue
       }
 
@@ -202,6 +246,7 @@ async function setup(text) {
             nav.pop()
           nav.push(node)
         }
+        scope = slug(node.innerText)
       }
       slide.appendChild(Nav(nav.slice(0, nav.length-1)))
       slide.appendChild(nav.slice(-1).shift().cloneNode(true))
@@ -211,6 +256,23 @@ async function setup(text) {
     //Handle footnotes
     if ((/^footer$/i.test(tag))&&([...node.classList].includes("footnotes"))) {
       footnotes = node
+      continue
+    }
+
+    //Scoped styles
+    if (/^style$/i.test(tag)) {
+      node.innerText = node.innerText.replace(/:scope/g, `#${scope}`)
+      slide?.appendChild(node)
+      continue
+    }
+
+    //Scripts
+    if (/^script$/i.test(tag)) {
+      const {enter = null, leave = null} = await eval(`(async function() { return ${node.innerText.trimStart()} })()`) ?? {}
+      if (enter)
+        LISTENERS.enter.set(scope, enter)
+      if (leave)
+        LISTENERS.leave.set(scope, leave)
       continue
     }
 
@@ -319,8 +381,22 @@ async function setup(text) {
 
   function Meta(data) {
     if (data.has("title")) {
-      document.querySelector(".meta-title").innerText = data.get("title")
+      document.querySelector(".meta-title").innerText = data.get("title").shift() ?? ""
       document.title = data.get("title")
+    }
+    if (data.has("menu-link")) {
+      document.querySelector(".d-title").after(...data.get("menu-link").map(link => {
+        const item = document.createElement("div")
+        item.classList.add("Header-item")
+        item.innerHTML = markdown.render(link)
+        item.innerHTML = item.querySelector("p").innerHTML
+        const a = item.querySelector("a")
+        if (a) {
+          a.classList.add("Header-link")
+          a.target = "_blank"
+        }
+        return item
+      }))
     }
   }
   Meta(meta)

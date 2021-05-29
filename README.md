@@ -140,6 +140,48 @@ Or use [primer css style](https://primer.style/css/) predefined classes like bel
   </div>
 </div>
 
+### 🎨 Styling slides
+
+When using `<style>` tags, [`:scope`](https://developer.mozilla.org/en-US/docs/Web/CSS/:scope) will be automatically changed to current slide:
+
+```css
+:scope .gradient-animated {
+  animation: gradient-animation 10s ease-in-out infinite;
+  background: linear-gradient(-60deg, #16BFFD, #16BFFD, #CB3066, #CB3066);
+  background-clip: text;
+}
+```
+
+```html
+<p class="gradient-animated">Wow look at this cool gradient animation!</p>
+```
+
+Will result into the following:
+
+<p class="gradient-animated">Wow look at this cool gradient animation!</p>
+
+You can use this to locally define custom style, like a custom background!
+
+::: warn
+Note that if you do not precede your rules by `:scope` selector, these will be applied globally!
+:::
+
+<style>
+  :scope .gradient-animated {
+    animation: gradient-animation 10s ease-in-out infinite;
+    background: linear-gradient(-60deg, #16BFFD, #16BFFD, #CB3066, #CB3066);
+    background-size: 300%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  @keyframes gradient-animation {
+    0% { background-position: 0 50%; }
+    50% { background-position: 100%; }
+    100% { background-position: 0 50%; }
+  }
+</style>
+
 ### 📦 Using meta-tags and meta-data
 
 The following meta-tags are supported:

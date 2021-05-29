@@ -141,7 +141,7 @@ async function setup(text) {
   const render = document.createElement("div")
   render.innerHTML = markdown.render(text)
   const nodes = Array.from(render.childNodes)
-  let slide = null, empty = false, footnotes = null, commented = false
+  let slide = null, empty = false, footnotes = null, commented = false, scope = null
   while (nodes.length) {
     const node = nodes.shift()
     const {nodeName:tag} = node
@@ -202,6 +202,7 @@ async function setup(text) {
             nav.pop()
           nav.push(node)
         }
+        scope = slug(node.innerText)
       }
       slide.appendChild(Nav(nav.slice(0, nav.length-1)))
       slide.appendChild(nav.slice(-1).shift().cloneNode(true))
@@ -211,6 +212,13 @@ async function setup(text) {
     //Handle footnotes
     if ((/^footer$/i.test(tag))&&([...node.classList].includes("footnotes"))) {
       footnotes = node
+      continue
+    }
+
+    //Scoped styles
+    if (/^style$/i.test(tag)) {
+      node.innerText = node.innerText.replace(/:scope/g, `#${scope}`)
+      slide?.appendChild(node)
       continue
     }
 

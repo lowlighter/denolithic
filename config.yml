@@ -1,6 +1,5 @@
 name: "Suicid Sqad"
-favicon: favicon.ico
-styles: 
+styles:
 plugins:
   - katex
   - markdown-it

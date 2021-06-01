@@ -7,7 +7,7 @@ export function slug(text:string) {
 }
 
 /** Load remote content */
-export async function load() {
+export function load() {
   const target = new URLSearchParams(global.location.search).get("target")
   return (target ? fetch("/api/load.ts", {method:"POST", body:target}) : fetch("/README.md")).then(response => response.text())
 }
@@ -45,7 +45,7 @@ export async function execute(uuid:string) {
 }
 
 /** Page selector */
-export async function page(direction?:number, {updateState = true} = {}) {
+export function page(direction?:number, {updateState = true} = {}) {
   //Load slides
   const slides = document.querySelector(".slides")
   if (slides) {

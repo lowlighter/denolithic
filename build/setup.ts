@@ -1,5 +1,5 @@
 //Imports
-import type { configuration } from "./types.ts"
+import type { configuration as Configuration } from "./types.ts"
 import { parse } from "https://deno.land/std@0.97.0/encoding/yaml.ts"
 import { copy, exists } from "https://deno.land/std@0.97.0/fs/mod.ts"
 import { DOMParser, Document } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts"
@@ -24,7 +24,7 @@ export async function templateIndexHTML() {
 
   //Load configuration
   console.log("loading configuration file")
-  const configuration = parse(await readTextFile("config.yml")) as configuration
+  const configuration = parse(await readTextFile("config.yml")) as Configuration
 
   //Set company name
   if(configuration.name) {
@@ -109,8 +109,7 @@ export async function bundleClientApp() {
     console.error(Deno.formatDiagnostics(diagnostics))
     throw new Error(`Failed to bundle app.js correctly`)
   }
-  console.log(JSON.stringify(Object.keys(files)))
-  await Deno.writeTextFile("public/app.js", Object.values(files).shift() ?? "")
+  await Deno.writeTextFile("public/app.js", Object.values(files).filter(file => /bundle.js$/.test(file)).shift() ?? "")
 }
 
 /** Create a new DOM element with the given attributes */
@@ -133,7 +132,7 @@ async function readTextFile(file:string) {
       process = Deno.run({cmd:["cat", file], stdout:"piped", stderr:"piped"})
       return new TextDecoder().decode(await process.output())
     }
-    catch (error) {
+    catch {
       console.warn(`failed to read ${file} using Deno.run`)
       return fetch(`https://raw.githubusercontent.com/lowlighter/denolithic/main/${file}`).then(response => response.text())
     }

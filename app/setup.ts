@@ -283,6 +283,7 @@ export async function setup() {
   document.querySelector("[aria-current='page']")?.addEventListener("click", () => page(0))
 
   //Theme chooser
+  //deno-lint-ignore no-explicit-any
   let theme = (globalThis as any).matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light"
   document.querySelector(".d-theme-switch")?.addEventListener("click", () => {
     const html = document.querySelector("html")

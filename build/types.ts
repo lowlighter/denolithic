@@ -4,6 +4,9 @@ export type configuration = {
   /** Organization name */
   name?:string
 
+  /** Opengraph metadata */
+  opengraph?:{[key:string]:string}
+
   /** List of additional styles to add */
   styles?:string[]
 

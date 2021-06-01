@@ -1,5 +1,13 @@
 name: "Suicid Sqad"
+opengraph:
+  title: Denolithic
+  type: website
+  image: /opengraph.png
+  description: Create presentation slides from markdown
 styles:
+  - https://unpkg.com/@primer/css@^16.0.0/dist/primer.css
+  - https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.0.0/build/styles/github-dark.min.css
+  - /styles.css
 plugins:
   - katex
   - markdown-it

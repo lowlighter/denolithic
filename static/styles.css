@@ -26,6 +26,16 @@ main {
   display: none !important;
 }
 
+.Header .dropdown-menu {
+  width: 240px;
+}
+
+/* Theme switcher */
+
+.d-theme-switch-dark, .d-theme-switch-light {
+  display: none;
+}
+
 /* Slides */
 
 .slides {
@@ -57,6 +67,8 @@ main {
 .slide pre {
   position: relative;
   min-height: 44px;
+  background-color: #161B22;
+  color: #c9d1d9;
 }
 
 .slide pre code {
@@ -101,7 +113,7 @@ main {
   margin-right: 0 !important;
 }
 
-.slide .executor-button[disabled] {
+.slide .executor-button[disabled=true] {
   cursor: progress;
 }
 

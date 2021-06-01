@@ -19,17 +19,23 @@ export async function createPublicDirectory() {
 export async function templateIndexHTML() {
   //Load templates/index.html
   console.log("loading templates/index.html")
-  const index = await fetch("https://raw.githubusercontent.com/lowlighter/denolithic/main/templates/index.html").then(response => response.text())
+  const index = await readTextFile("templates/index.html")
   const document = new DOMParser().parseFromString(index, "text/html") as Document
 
   //Load configuration
   console.log("loading configuration file")
-  const configuration = parse(await fetch("https://raw.githubusercontent.com/lowlighter/denolithic/main/config.yml").then(response => response.text())) as configuration
+  const configuration = parse(await readTextFile("config.yml")) as configuration
 
   //Set company name
   if(configuration.name) {
       //TODO
   }
+
+  //Opengraph metadata
+  console.log("applying opengraph metadata")
+  Object.entries(configuration.opengraph ?? {}).forEach((property, content) =>
+    document.head.appendChild(createElement(document, "meta", {property:`og:${property}`, content}))
+  )
 
   //Set plugins dependecies
   //TODO Manage markdown-it plugins
@@ -76,7 +82,7 @@ export async function templateIndexHTML() {
   console.log("templating public/index.html")
   const html = `
     <!DOCTYPE html>
-    <html>
+    <html data-color-mode="auto" data-light-theme="light" data-dark-theme="dark">
       <head>
         ${document.head.innerHTML}
       </head>
@@ -95,10 +101,43 @@ export async function copyStaticAssets() {
   }
 }
 
+/** Bundle client app from typescript to a single javascript file */
+export async function bundleClientApp() {
+  console.log("bundling client app")
+  const {files, diagnostics} = await Deno.emit("app/mod.ts", {bundle:"classic", compilerOptions:{}})
+  if (diagnostics.length) {
+    console.error(Deno.formatDiagnostics(diagnostics))
+    throw new Error(`Failed to bundle app.js correctly`)
+  }
+  await Deno.writeTextFile("public/app.js", Object.values(files).shift() ?? "")
+}
+
 /** Create a new DOM element with the given attributes */
 function createElement(document:Document, type: string, attributes: {[key:string]:string|boolean|number}){
   const element = document.createElement(type)
   for (const [key, value] of Object.entries(attributes))
       element.setAttribute(key, value)
   return element
+}
+
+/** Read text file magic */
+async function readTextFile(file:string) {
+  try {
+    return Deno.readTextFile(file)
+  }
+  catch {
+    console.warn(`failed to read ${file} using Deno.readTextFile`)
+    let process
+    try {
+      process = Deno.run({cmd:["cat", file], stdout:"piped", stderr:"piped"})
+      return new TextDecoder().decode(await process.output())
+    }
+    catch (error) {
+      console.warn(`failed to read ${file} using Deno.run`)
+      return fetch(`https://raw.githubusercontent.com/lowlighter/denolithic/main/${file}`).then(response => response.text())
+    }
+    finally {
+      process?.close()
+    }
+  }
 }

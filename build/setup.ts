@@ -109,7 +109,7 @@ export async function bundleClientApp() {
     console.error(Deno.formatDiagnostics(diagnostics))
     throw new Error(`Failed to bundle app.js correctly`)
   }
-  await Deno.writeTextFile("public/app.js", Object.values(files).filter(file => /bundle.js$/.test(file)).shift() ?? "")
+  await Deno.writeTextFile("public/app.js", Object.entries(files).filter(([file]) => /bundle.js$/.test(file)).map(([_, value]) => value).shift() ?? "")
 }
 
 /** Create a new DOM element with the given attributes */

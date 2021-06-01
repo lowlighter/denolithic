@@ -10,7 +10,7 @@
   "env": {
     "DENO_UNSTABLE": "true"
   },
-  "github":{
+  "github": {
     "silent": true,
     "autoJobCancelation": true
   }

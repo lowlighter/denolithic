@@ -109,6 +109,7 @@ export async function bundleClientApp() {
     console.error(Deno.formatDiagnostics(diagnostics))
     throw new Error(`Failed to bundle app.js correctly`)
   }
+  console.log(JSON.stringify(files))
   await Deno.writeTextFile("public/app.js", Object.values(files).shift() ?? "")
 }
 

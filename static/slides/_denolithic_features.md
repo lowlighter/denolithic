@@ -159,7 +159,7 @@ To use this feature, embed a `script` tag which returns an object:
 You can use it for small interactions like `<canvas>` drawing or confetti popping 🎉 !
 
 ::: error
-Note that code is actually interpreted through [`eval`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval) so pay attention to what you're running when using this
+Note that code is actually interpreted through [`eval`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval) so pay attention to what you're running when using this!
 :::
 
 <script>

@@ -17,10 +17,10 @@ This `README.md` is intended to be viewed as a [denolithic presentation slides](
 ## ✨ Features
 - Markdown powered slides, including extended markup features and raw html support
 - Interactive, editable and syntax-colored code blocks
-  - JS and TS code snippets can even be ran live!
+  - Code snippets can even be ran live! (provided it is supported)
 - Smooth design powered by GitHub's primer style
 - Intuitive controls and navigation elements, including linkable slides
-- Metadata support
+- Metadata support to customize links, include others slides, etc.
 
 ## 👨‍🔬 Using denolithic
 

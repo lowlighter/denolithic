@@ -27,3 +27,14 @@ jobs:
           config-file: ./.github/config/codeql.yml
       - name: Analyze code
         uses: github/codeql-action/analyze@v1
+
+  lint:
+    name: Lint code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Setup Deno
+        uses: denolib/setup-deno@v2
+      - name: Lint code
+        run: deno lint

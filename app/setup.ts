@@ -230,7 +230,9 @@ export async function setup() {
   document.querySelectorAll(`a[href^="#"]`).forEach(anchor =>
     anchor.addEventListener("click", function (this:DOMNode, event:event) {
       event.preventDefault()
-      document.querySelector(this.getAttribute("href"))?.scrollIntoView({behavior:"smooth"})
+      const href = this.getAttribute("href")
+      if (href.substring(1).length)
+        document.querySelector(href)?.scrollIntoView({behavior:"smooth"})
     })
   )
 

@@ -79,6 +79,15 @@ export async function setup() {
     if (commented)
       continue
 
+    //Proxy images
+    if (node.querySelectorAll?.("img[src^='/']")?.length) {
+      const target = `${new URLSearchParams(global.location.search).get("target") ?? ""}`
+      node.querySelectorAll("img[src^='/']").forEach((img:DOMNode) => {
+        const source = img.getAttribute("src")
+        img.setAttribute("src", source.charAt(0) === "/" ? `/api/img?source=${encodeURIComponent(source)}&target=${encodeURIComponent(target)}` : source)
+      })
+    }
+
     //Handle headers and separators
     if (/^h[1-6r]$/i.test(tag)) {
       //If previous slide was empty, switch to interlude

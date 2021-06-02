@@ -1,10 +1,8 @@
 //Imports
 import type { ServerRequest } from "https://deno.land/std@0.97.0/http/server.ts"
-import { readAll, writeAll } from "https://deno.land/std@0.97.0/io/util.ts"
 
 /** GitHub content */
 const RAW_GITHUB = /https:[/][/]raw[.]githubusercontent[.]com[/](?<owner>[-\w]+)[/](?<repo>[-\w]+)[/](?<branch>[-\w]+)/
-
 
 /** Request handler */
 export default async function (request: ServerRequest) {

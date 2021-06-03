@@ -20,15 +20,20 @@ export async function templateIndexHTML() {
   //Load templates/index.html
   console.log("loading templates/index.html")
   const index = await readTextFile("templates/index.html")
-  const document = new DOMParser().parseFromString(index, "text/html") as Document
+  let document = new DOMParser().parseFromString(index, "text/html") as Document
 
   //Load configuration
   console.log("loading configuration file")
   const configuration = parse(await readTextFile("config.yml")) as Configuration
 
-  //Set company name
-  if(configuration.name) {
-      //TODO
+  //Set signature
+  if(configuration?.signature && document.querySelector(".footer-signature")) {
+    document.querySelector(".footer-signature")!.innerHTML = configuration.signature
+  }
+
+  //Set logo
+  if(configuration?.logo) {
+    //TODO
   }
 
   //Opengraph metadata

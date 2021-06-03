@@ -4,6 +4,12 @@ export type configuration = {
   /** Organization name */
   name?:string
 
+  /** Organization signature */
+  signature?:string
+
+  /** Organization logo */
+  logo?:string
+
   /** Opengraph metadata */
   opengraph?:{[key:string]:string}
 

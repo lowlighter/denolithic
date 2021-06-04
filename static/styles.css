@@ -42,7 +42,6 @@ main {
 }
 
 .Footer {
-  /* background-color: var(--color-header-bg); */
   margin-bottom: 8px;
   display: flex;
   align-items: center;

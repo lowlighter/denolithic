@@ -54,6 +54,19 @@ main {
   text-align: right;
 }
 
+.paginate-container {
+  white-space: nowrap;
+}
+
+@media screen and (max-width: 360px) {
+  .footer-logo  {
+    display: none;
+  }
+  .footer-signature {
+    display: none
+  }
+}
+
 /* Theme switcher */
 
 .d-theme-switch-dark, .d-theme-switch-light {

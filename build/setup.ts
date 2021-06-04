@@ -26,9 +26,14 @@ export async function templateIndexHTML() {
   console.log("loading configuration file")
   const configuration = parse(await readTextFile("config.yml")) as Configuration
 
-  //Set company name
-  if(configuration.name) {
-      //TODO
+  //Set signature
+  if(configuration?.signature && document.querySelector(".footer-signature")) {
+    document.querySelector(".footer-signature")!.innerHTML = configuration.signature.replaceAll('\n', "<br>")
+  }
+
+  //Set logo
+  if(configuration?.logo) {
+    //TODO
   }
 
   //Opengraph metadata

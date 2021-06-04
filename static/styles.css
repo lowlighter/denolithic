@@ -18,6 +18,11 @@ main {
   fill: currentColor;
 }
 
+.Header-item {
+
+  white-space: nowrap;
+}
+
 .btn[disabled] {
   cursor: not-allowed;
 }
@@ -28,6 +33,51 @@ main {
 
 .Header .dropdown-menu {
   width: 240px;
+}
+
+@media screen and (max-width: 500px) {
+  .Header > :not(.Header-item-nav){
+    display: none;
+  }  
+}
+
+.Footer {
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  align-content: center;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  border-top: 1px solid var(--color-auto-gray-2);
+}
+
+.Footer > *{
+  margin-top: 16px;
+  margin-bottom: 16px;
+  margin-left: 5vw;
+  margin-right: 5vw;
+  width: 10vw; 
+  flex-grow: 1;
+}
+
+.footer-logo {
+  text-align: right;
+}
+
+.paginate-container {
+  white-space: nowrap;
+}
+
+@media screen and (max-width: 500px) {
+  .footer-logo  {
+    display: none;
+  }
+  .footer-signature {
+    display: none
+  }
+  .Footer {
+    bottom: 0px;
+  }
 }
 
 /* Theme switcher */
@@ -42,6 +92,7 @@ main {
   flex-grow: 1;
   display: flex;
   overflow-x: auto;
+  padding-bottom: 16px;
 }
 
 .slide {

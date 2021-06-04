@@ -20,7 +20,7 @@ export async function templateIndexHTML() {
   //Load templates/index.html
   console.log("loading templates/index.html")
   const index = await readTextFile("templates/index.html")
-  let document = new DOMParser().parseFromString(index, "text/html") as Document
+  const document = new DOMParser().parseFromString(index, "text/html") as Document
 
   //Load configuration
   console.log("loading configuration file")

@@ -18,6 +18,11 @@ main {
   fill: currentColor;
 }
 
+.Header-item {
+
+  white-space: nowrap;
+}
+
 .btn[disabled] {
   cursor: not-allowed;
 }
@@ -28,6 +33,12 @@ main {
 
 .Header .dropdown-menu {
   width: 240px;
+}
+
+@media screen and (max-width: 500px) {
+  .Header > :not(.Header-item-nav){
+    display: none;
+  }  
 }
 
 .Footer {
@@ -58,12 +69,15 @@ main {
   white-space: nowrap;
 }
 
-@media screen and (max-width: 360px) {
+@media screen and (max-width: 500px) {
   .footer-logo  {
     display: none;
   }
   .footer-signature {
     display: none
+  }
+  .Footer {
+    bottom: 0px;
   }
 }
 

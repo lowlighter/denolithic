@@ -28,7 +28,7 @@ export async function templateIndexHTML() {
 
   //Set signature
   if(configuration?.signature && document.querySelector(".footer-signature")) {
-    document.querySelector(".footer-signature")!.innerHTML = configuration.signature
+    document.querySelector(".footer-signature")!.innerHTML = configuration.signature.replaceAll('\n', "<br>")
   }
 
   //Set logo

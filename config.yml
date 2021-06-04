@@ -1,5 +1,7 @@
 name: "Lowlighter"
-signature: "Made with <span style='color:pink;'><3</span><br>©2021. All Rights Reserved"
+signature: |
+  Made with 💖
+  ©2021. All Rights Reserved
 opengraph:
   title: Denolithic
   type: website

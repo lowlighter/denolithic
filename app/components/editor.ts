@@ -17,7 +17,9 @@ export function Editor({target, key, ctrlKey}:{target:DOMNode, key?:string, ctrl
       const value = new global.DOMParser().parseFromString(target.value, "text/html").documentElement.textContent
       Editor.timeout.set(target, setTimeout(() => target.parentNode.querySelector("code").innerHTML = global.hljs.highlight(value, {language, ignoreIllegals:true}).value, timeout))
     }
-  } catch { null }
+  }
+  //deno-lint-ignore no-empty
+  catch { }
   //Handle code execution shortcut
   if ((key === "Enter")&&(ctrlKey))
     execute(target.parentNode.getAttribute("data-executor-uuid"))
